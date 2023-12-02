@@ -45,7 +45,7 @@ To check if the player is in the air, add a line in the `_physics_process` funct
 - Set the Character value to your character node (it's under the Nodes group)
 - Change the `anchors_preset` value on the reticle to Center
 
-**How to create a new reticle**  
+**How to create a new reticle:**  
 - Choose a reticle to base it off of
 - Open that reticle and save it as a new reticle
 - Edit the reticle to your needs
