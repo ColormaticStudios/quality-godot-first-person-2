@@ -1,8 +1,7 @@
-[gd_scene load_steps=12 format=3 uid="uid://cc1m2a1obsyn4"]
+[gd_scene load_steps=11 format=3 uid="uid://cc1m2a1obsyn4"]
 
 [ext_resource type="Script" path="res://addons/fpc/character.gd" id="1_0t4e8"]
 [ext_resource type="PackedScene" uid="uid://3mij3cjhkwsm" path="res://addons/fpc/reticles/reticle_1.tscn" id="2_uuexm"]
-[ext_resource type="PackedScene" uid="uid://coqpusufa8a6k" path="res://addons/fpc/reticles/reticle_0.tscn" id="3_ce64v"]
 [ext_resource type="Script" path="res://addons/fpc/debug.gd" id="3_x1wcc"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kp17n"]
@@ -97,16 +96,13 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
 
-[node name="Reticle_0" parent="UserInterface" instance=ExtResource("3_ce64v")]
-visible = false
-layout_mode = 1
-
 [node name="Reticle_1" parent="UserInterface" node_paths=PackedStringArray("reticle_lines", "character") instance=ExtResource("2_uuexm")]
 layout_mode = 1
 reticle_lines = [NodePath("top"), NodePath("left"), NodePath("right"), NodePath("bottom")]
 character = NodePath("../..")
 
 [node name="DebugPanel" type="PanelContainer" parent="UserInterface"]
+visible = false
 layout_mode = 0
 offset_left = 10.0
 offset_top = 10.0
