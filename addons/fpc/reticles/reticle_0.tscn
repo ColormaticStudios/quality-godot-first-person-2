@@ -1,0 +1,37 @@
+[gd_scene load_steps=2 format=3 uid="uid://coqpusufa8a6k"]
+
+[sub_resource type="GDScript" id="GDScript_10f85"]
+script/source = "extends CenterContainer
+
+
+@export_category(\"Reticle\")
+@export_group(\"Nodes\")
+@export var character : CharacterBody3D
+
+@export_group(\"Settings\")
+@export var dot_size : int = 1
+@export var dot_color : Color = Color.WHITE
+
+
+func _process(_delta):
+	if visible: # If the reticle is disabled (not visible), don't bother updating it
+		update_reticle_settings()
+
+func update_reticle_settings():
+	$dot.scale.x = dot_size
+	$dot.scale.y = dot_size
+	$dot.color = dot_color
+"
+
+[node name="Reticle" type="CenterContainer"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_10f85")
+
+[node name="dot" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-1, -1, 1, -1, 1, 1, -1, 1)
