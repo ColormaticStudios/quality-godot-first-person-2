@@ -40,18 +40,18 @@ Click on the character node and there should be settings in the "Feature Setting
 **How to add animations for a mesh:**  
 - Create a function for your animation and attach it to `_physics_process` to call it every frame.
 - Use `input_dir` as a boolean (it is actually a `Vector2`) to know if the player is walking.
-- Use the `state` member variable to tell if the player is sprinting or crouching
+- Use the `state` member variable to tell if the player is sprinting or crouching.
 - Use the `is_on_floor` function to tell if the player is standing or falling.
 
 **How to change reticles (crosshairs):**  
-- Find the folder at `res://addons/fpc/reticles`
+- Find the folder at `res://addons/fpc/reticles`.
 - Pick one and add it to the `UserInterface` node in the character scene. You may need to right click on the character and enable "Editable Children".
-- Set the Character value to your character node (it's under the Nodes group)
-- Change the `anchors_preset` value on the reticle to Center
+- Set the Character value to your character node. (it's under the Nodes group)
+- Change the `anchors_preset` value on the reticle to Center.
 
 **How to create a new reticle:**  
-- Choose a reticle to base it off of
-- Open that reticle and save it as a new reticle
-- Edit the reticle to your needs
-- Follow the "how to change reticles" directions to use it
+- Choose a reticle to base it off of.
+- Open that reticle and save it as a new reticle.
+- Edit the reticle to your needs.
+- Follow the "how to change reticles" directions to use it.
 
