@@ -52,6 +52,7 @@ Click on the character node and there should be settings in the "Feature Setting
 **How to create a new reticle:**  
 - Choose a reticle to base it off of.
 - Open that reticle and save it as a new reticle.
+- Remove the script from the reticle and create a new one. (for some reason you have to do this)
 - Edit the reticle to your needs.
 - Follow the "how to change reticles" directions to use it.
 
