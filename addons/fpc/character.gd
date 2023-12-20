@@ -15,6 +15,7 @@ extends CharacterBody3D
 @export var HEAD : Node3D
 @export var CAMERA : Camera3D
 @export var CAMERA_ANIMATION : AnimationPlayer
+@export var COLLISION_MESH : CollisionShape3D
 
 @export_group("Controls")
 # We are using UI controls because they are built into Godot Engine so they can be used right away
@@ -26,6 +27,12 @@ extends CharacterBody3D
 @export var PAUSE : String = "ui_cancel"
 @export var CROUCH : String
 @export var SPRINT : String
+
+# Uncomment if you want full controller support
+#@export var LOOK_LEFT : String
+#@export var LOOK_RIGHT : String
+#@export var LOOK_UP : String
+#@export var LOOK_DOWN : String
 
 @export_group("Feature Settings")
 @export var immobile : bool = false
@@ -42,8 +49,9 @@ extends CharacterBody3D
 
 # Member variables
 var speed : float = base_speed
-var is_crouching : bool = false
-var is_sprinting : bool = false
+# States: normal, crouching, sprinting
+var state : String = "normal"
+var low_ceiling : bool = false # This is for when the cieling is too low and the player needs to crouch.
 
 # Get the gravity from the project settings to be synced with RigidBody nodes
 var gravity : float = ProjectSettings.get_setting("physics/3d/default_gravity") # Don't set this as a const, see the gravity section in _physics_process
@@ -51,6 +59,7 @@ var gravity : float = ProjectSettings.get_setting("physics/3d/default_gravity") 
 
 func _ready():
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
 
 func _physics_process(delta):
 	
@@ -68,19 +77,13 @@ func _physics_process(delta):
 	var input_dir = Vector2.ZERO
 	if !immobile:
 		input_dir = Input.get_vector(LEFT, RIGHT, FORWARD, BACKWARD)
-	
 	handle_movement(delta, input_dir)
 	
-	toggle_crouch()
-	toggle_sprint(input_dir)
+	low_ceiling = $CrouchCeilingDetection.is_colliding()
 	
-	if is_crouching:
-		speed = crouch_speed
-	elif is_sprinting:
-		speed = sprint_speed
-	else:
-		speed = base_speed
-	
+	handle_state(input_dir)
+	update_camera_fov()
+	update_collision_scale()
 	
 	if view_bobbing:
 		headbob_animation(input_dir)
@@ -95,15 +98,14 @@ func handle_jumping():
 			if Input.is_action_just_pressed(JUMP) and is_on_floor():
 				velocity.y += jump_velocity
 
+
 func handle_movement(delta, input_dir):
-	
 	var direction = input_dir.rotated(-HEAD.rotation.y)
 	direction = Vector3(direction.x, 0, direction.y)
-	
 	move_and_slide()
 	
 	if in_air_momentum:
-		if is_on_floor(): # Don't lerp y movement
+		if is_on_floor():
 			if motion_smoothing:
 				velocity.x = lerp(velocity.x, direction.x * speed, acceleration * delta)
 				velocity.z = lerp(velocity.z, direction.z * speed, acceleration * delta)
@@ -119,58 +121,78 @@ func handle_movement(delta, input_dir):
 			velocity.z = direction.z * speed
 
 
-func _process(delta):
-	
-	$UserInterface/DebugPanel.add_property("FPS", 1.0/delta, 0)
-	
-	if Input.is_action_just_pressed(PAUSE):
-		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-		elif Input.mouse_mode == Input.MOUSE_MODE_VISIBLE:
-			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-
-
-func _unhandled_input(event):
-	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-		HEAD.rotation_degrees.y -= event.relative.x * mouse_sensitivity
-		HEAD.rotation_degrees.x -= event.relative.y * mouse_sensitivity
-		HEAD.rotation.x = clamp(HEAD.rotation.x, deg_to_rad(-90), deg_to_rad(90))
-
-
-func toggle_crouch():
-	if crouch_enabled:
-		if crouch_mode == 0:
-			is_crouching = Input.is_action_pressed(CROUCH)
-		elif crouch_mode == 1:
-			if Input.is_action_just_pressed(CROUCH):
-				is_crouching = !is_crouching
-	
-		# Replace with your own crouch animation code
-		if is_crouching:
-			$Collision.scale.y = lerp($Collision.scale.y, 0.75, 0.2)
-		else:
-			$Collision.scale.y = lerp($Collision.scale.y, 1.0, 0.2)
-
-
-func toggle_sprint(moving):
+func handle_state(moving):
 	if sprint_enabled:
 		if sprint_mode == 0:
-			if !is_crouching: # Crouching takes priority over sprinting
-				is_sprinting = Input.is_action_pressed(SPRINT)
-			else:
-				is_sprinting = false # Fix a bug where if you are sprinting and then crouch then let go of the sprinting button you keep sprinting
-		elif sprint_mode == 1:
-			if Input.is_action_just_pressed(SPRINT):
-				if !is_crouching:
-					is_sprinting = !is_sprinting
+			if Input.is_action_pressed("sprint") and !Input.is_action_pressed("crouch"):
+				if moving:
+					if state != "sprinting":
+						enter_sprint_state()
 				else:
-					is_sprinting = false
+					if state == "sprinting":
+						enter_normal_state()
+			elif state == "sprinting":
+				enter_normal_state()
+		elif sprint_mode == 1:
+			if moving:
+				if Input.is_action_just_pressed("sprint"):
+					match state:
+						"normal":
+							enter_sprint_state()
+						"sprinting":
+							enter_normal_state()
+			elif state == "sprinting":
+				enter_normal_state()
 	
-		if dynamic_fov:
-			if is_sprinting and moving:
-				CAMERA.fov = lerp(CAMERA.fov, 85.0, 0.3)
-			else:
-				CAMERA.fov = lerp(CAMERA.fov, 75.0, 0.3)
+	if crouch_enabled:
+		if crouch_mode == 0:
+			if Input.is_action_pressed("crouch") and !Input.is_action_pressed("sprint"):
+				if state != "crouching":
+					enter_crouch_state()
+			elif state == "crouching" and !$CrouchCeilingDetection.is_colliding():
+				enter_normal_state()
+		elif crouch_mode == 1:
+			if Input.is_action_just_pressed("crouch"):
+				match state:
+					"normal":
+						enter_crouch_state()
+					"crouching":
+						if !$CrouchCeilingDetection.is_colliding():
+							enter_normal_state()
+
+
+func enter_normal_state():
+	#print("entering normal state")
+	var prev_state = state
+	state = "normal"
+	speed = base_speed
+
+func enter_crouch_state():
+	#print("entering crouch state")
+	var prev_state = state
+	state = "crouching"
+	speed = crouch_speed
+
+
+func enter_sprint_state():
+	#print("entering sprint state")
+	var prev_state = state
+	state = "sprinting"
+	speed = sprint_speed
+
+
+func update_camera_fov():
+	if state == "sprinting":
+		CAMERA.fov = lerp(CAMERA.fov, 85.0, 0.3)
+	else:
+		CAMERA.fov = lerp(CAMERA.fov, 75.0, 0.3)
+
+
+func update_collision_scale():
+	if state == "crouching": # Add your own crouch animation code
+		COLLISION_MESH.scale.y = lerp(COLLISION_MESH.scale.y, 0.75, 0.2)
+	else:
+		COLLISION_MESH.scale.y = lerp(COLLISION_MESH.scale.y, 1.0, 0.2)
 
 
 func headbob_animation(moving):
@@ -179,3 +201,27 @@ func headbob_animation(moving):
 		CAMERA_ANIMATION.speed_scale = speed / base_speed
 	else:
 		CAMERA_ANIMATION.play("RESET")
+
+
+func _process(delta):
+	$UserInterface/DebugPanel.add_property("FPS", 1.0/delta, 0)
+	$UserInterface/DebugPanel.add_property("State", state, 0)
+	
+	if Input.is_action_just_pressed(PAUSE):
+		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		elif Input.mouse_mode == Input.MOUSE_MODE_VISIBLE:
+			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	
+	HEAD.rotation.x = clamp(HEAD.rotation.x, deg_to_rad(-90), deg_to_rad(90))
+	
+	# Uncomment if you want full controller support
+	#var controller_view_rotation = Input.get_vector(LOOK_LEFT, LOOK_RIGHT, LOOK_UP, LOOK_DOWN)
+	#HEAD.rotation_degrees.y -= controller_view_rotation.x * 1.5
+	#HEAD.rotation_degrees.x -= controller_view_rotation.y * 1.5
+
+
+func _unhandled_input(event):
+	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+		HEAD.rotation_degrees.y -= event.relative.x * mouse_sensitivity
+		HEAD.rotation_degrees.x -= event.relative.y * mouse_sensitivity

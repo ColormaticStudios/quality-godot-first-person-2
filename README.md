@@ -18,6 +18,7 @@ Move with WASD, space to jump, shift to sprint, C to crouch.
  - Crouching
  - Sprinting
  - 2 crosshairs/reticles, one is animated (more to come?)
+ - Controller/GamePad support (enabled through code, see wiki)
 
 If you make a cool game with this addon, I would love to hear about it!
 
@@ -26,7 +27,12 @@ If you make a cool game with this addon, I would love to hear about it!
 
 You can make this a super basic controller by just disabling everything.
 
-**How to change settings:**  
+**How to add controller/GamePad support**  
+In the controls export group, there is a commented section at the end that says "Uncomment this if you want full controller support". Uncomment that block.  
+Make a key map for each direction (left, right, up, down) and map them to your joystick.  
+Write in these keymaps in the controls section of the player settings.  
+In the `_process` function, there is another block of commented code at the end that says the same thing. Uncomment that too.  
+You should now be able to look around with the joystick. Make sure you add the other controls to the input map. (movement, jumping, crouching, sprinting, etc.)
 
 **How to change settings:**  
 Click on the character node and there should be settings in the "Feature Settings" group.
