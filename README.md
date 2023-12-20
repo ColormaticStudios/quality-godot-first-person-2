@@ -2,7 +2,7 @@
 Actually good first person controller for the Godot Engine.  
 MIT License (credit Colormatic Studios)
 
-This first person controller was made because there aren't many first person controllers for Godot, and the ones that do exist are pretty bad.
+This first person controller was made because there aren't many first person controllers for Godot, and the ones that do exist are pretty bad.  
 It is highly customizable and comes with many features, QOL, and clean code.
 
 Some parts came from StayAtHomeDev's FPS tutorial. You can find that [here](https://www.youtube.com/playlist?list=PLEHvj4yeNfeF6s-UVs5Zx5TfNYmeCiYwf).
@@ -22,15 +22,16 @@ Move with WASD, space to jump, shift to sprint, C to crouch.
 If you make a cool game with this addon, I would love to hear about it!
 
 # Wiki
-**To start out**, you should probably remap all of the movement keys to your own control set.  
+**To start out**, you should probably remap all of the movement keys to your own control set.
+
 You can make this a super basic controller by just disabling everything.
 
 **How to change settings:**  
 
+**How to change settings:**  
 Click on the character node and there should be settings in the "Feature Settings" group.
 
 **How to add animations for a mesh:**  
-
 In the `_physics_process` function, add a line to check whether you are walking or aren't walking. You can do this by checking whether `input_dir` is true or false. Optionally, set the  animation speed to `speed / base_speed`. This will make it so when the player is walking, your animation speed is 1. If the player is sprinting, your animation goes up and if the player is crouching your animation speed goes down.
 
 In  the `toggle_sprint` function, add a line at the end where if `is_sprinting` is true, your animation is set to sprint.
