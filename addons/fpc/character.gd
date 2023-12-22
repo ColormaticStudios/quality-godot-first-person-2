@@ -82,7 +82,8 @@ func _physics_process(delta):
 	low_ceiling = $CrouchCeilingDetection.is_colliding()
 	
 	handle_state(input_dir)
-	update_camera_fov()
+	if dynamic_fov:
+		update_camera_fov()
 	update_collision_scale()
 	
 	if view_bobbing:
