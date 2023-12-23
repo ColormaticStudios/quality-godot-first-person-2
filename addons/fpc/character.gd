@@ -206,7 +206,9 @@ func headbob_animation(moving):
 
 func _process(delta):
 	$UserInterface/DebugPanel.add_property("FPS", Performance.get_monitor(Performance.TIME_FPS), 0)
-	$UserInterface/DebugPanel.add_property("State", state, 0)
+	var status: String = state
+	if not is_on_floor(): status += " (in air)"
+	$UserInterface/DebugPanel.add_property("State", status, 0)
 	
 	if Input.is_action_just_pressed(PAUSE):
 		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
