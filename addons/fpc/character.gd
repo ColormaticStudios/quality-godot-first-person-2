@@ -65,7 +65,13 @@ func _physics_process(delta):
 	
 	# Add some debug data
 	$UserInterface/DebugPanel.add_property("Movement Speed", speed, 1)
-	$UserInterface/DebugPanel.add_property("Velocity", get_real_velocity(), 2)
+	var cv: Vector3 = get_real_velocity()
+	var vd: Dictionary = {
+		'X':snappedf(cv.x, 0.001),
+		'Y':snappedf(cv.y, 0.001),
+		'Z':snappedf(cv.z, 0.001)
+	}
+	$UserInterface/DebugPanel.add_property("Velocity", vd, 2)
 	
 	# Gravity
 	#gravity = ProjectSettings.get_setting("physics/3d/default_gravity") # If the gravity changes during your game, uncomment this code
