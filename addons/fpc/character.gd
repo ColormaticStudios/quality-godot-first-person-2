@@ -136,7 +136,7 @@ func handle_state(moving):
 				enter_normal_state()
 		elif sprint_mode == 1:
 			if moving:
-				if Input.is_action_just_pressed("sprint"):
+				if Input.is_action_just_pressed(SPRINT):
 					match state:
 						"normal":
 							enter_sprint_state()
@@ -153,7 +153,7 @@ func handle_state(moving):
 			elif state == "crouching" and !$CrouchCeilingDetection.is_colliding():
 				enter_normal_state()
 		elif crouch_mode == 1:
-			if Input.is_action_just_pressed("crouch"):
+			if Input.is_action_just_pressed(CROUCH):
 				match state:
 					"normal":
 						enter_crouch_state()
@@ -173,7 +173,6 @@ func enter_crouch_state():
 	var prev_state = state
 	state = "crouching"
 	speed = crouch_speed
-
 
 func enter_sprint_state():
 	#print("entering sprint state")
