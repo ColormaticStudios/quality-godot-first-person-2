@@ -125,7 +125,7 @@ func handle_movement(delta, input_dir):
 func handle_state(moving):
 	if sprint_enabled:
 		if sprint_mode == 0:
-			if Input.is_action_pressed("sprint") and !Input.is_action_pressed("crouch"):
+			if Input.is_action_pressed(SPRINT) and !Input.is_action_pressed(CROUCH):
 				if moving:
 					if state != "sprinting":
 						enter_sprint_state()
@@ -147,7 +147,7 @@ func handle_state(moving):
 	
 	if crouch_enabled:
 		if crouch_mode == 0:
-			if Input.is_action_pressed("crouch") and !Input.is_action_pressed("sprint"):
+			if Input.is_action_pressed(CROUCH) and !Input.is_action_pressed(SPRINT):
 				if state != "crouching":
 					enter_crouch_state()
 			elif state == "crouching" and !$CrouchCeilingDetection.is_colliding():
