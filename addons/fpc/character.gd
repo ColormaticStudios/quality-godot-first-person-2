@@ -59,6 +59,9 @@ var gravity : float = ProjectSettings.get_setting("physics/3d/default_gravity") 
 
 func _ready():
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	
+	# Reset the camera position
+	CAMERA_ANIMATION.play("RESET")
 
 
 func _physics_process(delta):
@@ -203,10 +206,10 @@ func update_collision_scale():
 
 func headbob_animation(moving):
 	if moving and is_on_floor():
-		CAMERA_ANIMATION.play("headbob")
-		CAMERA_ANIMATION.speed_scale = speed / base_speed
+		CAMERA_ANIMATION.play("headbob", 0.5)
+		CAMERA_ANIMATION.speed_scale = (speed / base_speed) * 1.75
 	else:
-		CAMERA_ANIMATION.play("RESET")
+		CAMERA_ANIMATION.play("RESET", 0.5)
 
 
 func _process(delta):
