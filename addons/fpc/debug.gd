@@ -5,7 +5,7 @@ func _process(delta):
 	if visible:
 		pass
 
-func add_property(title:String, value, order):
+func add_property(title : String, value, order : int):
 	var target
 	target = $MarginContainer/VBoxContainer.find_child(title, true, false)
 	if !target:

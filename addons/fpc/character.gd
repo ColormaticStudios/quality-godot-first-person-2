@@ -171,6 +171,8 @@ func handle_state(moving):
 							enter_normal_state()
 
 
+# Any enter state function should only be called once when you want to enter that state, not every frame.
+
 func enter_normal_state():
 	#print("entering normal state")
 	var prev_state = state
@@ -206,10 +208,10 @@ func update_collision_scale():
 
 func headbob_animation(moving):
 	if moving and is_on_floor():
-		CAMERA_ANIMATION.play("headbob", 0.5)
+		CAMERA_ANIMATION.play("headbob", 0.25)
 		CAMERA_ANIMATION.speed_scale = (speed / base_speed) * 1.75
 	else:
-		CAMERA_ANIMATION.play("RESET", 0.5)
+		CAMERA_ANIMATION.play("RESET", 0.25)
 
 
 func _process(delta):
