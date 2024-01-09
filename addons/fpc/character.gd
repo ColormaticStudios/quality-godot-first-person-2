@@ -62,10 +62,16 @@ func _ready():
 
 
 func _physics_process(delta):
-	
 	# Add some debug data
 	$UserInterface/DebugPanel.add_property("Movement Speed", speed, 1)
-	$UserInterface/DebugPanel.add_property("Velocity", get_real_velocity(), 2)
+	var cv : Vector3 = get_real_velocity()
+	var vd : Array[float] = [
+		snappedf(cv.x, 0.001),
+		snappedf(cv.y, 0.001),
+		snappedf(cv.z, 0.001)
+	]
+	var readable_velocity : String = "X: " + str(vd[0]) + " Y: " + str(vd[1]) + " Z: " + str(vd[2])
+	$UserInterface/DebugPanel.add_property("Velocity", readable_velocity, 2)
 	
 	# Gravity
 	#gravity = ProjectSettings.get_setting("physics/3d/default_gravity") # If the gravity changes during your game, uncomment this code
@@ -204,8 +210,11 @@ func headbob_animation(moving):
 
 
 func _process(delta):
-	$UserInterface/DebugPanel.add_property("FPS", 1.0/delta, 0)
-	$UserInterface/DebugPanel.add_property("State", state, 0)
+	$UserInterface/DebugPanel.add_property("FPS", Performance.get_monitor(Performance.TIME_FPS), 0)
+	var status : String = state
+	if !is_on_floor():
+		status += " in the air"
+	$UserInterface/DebugPanel.add_property("State", status, 0)
 	
 	if Input.is_action_just_pressed(PAUSE):
 		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
