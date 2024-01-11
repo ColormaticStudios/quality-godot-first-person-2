@@ -11,6 +11,8 @@ extends CharacterBody3D
 @export var jump_velocity : float = 4.5
 @export var mouse_sensitivity : float = 0.1
 
+@export var initial_facing_direction : Vector3 = Vector3.ZERO
+
 @export_group("Nodes")
 @export var HEAD : Node3D
 @export var CAMERA : Camera3D
@@ -59,6 +61,10 @@ var gravity : float = ProjectSettings.get_setting("physics/3d/default_gravity") 
 
 func _ready():
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	
+	# Set the camera rotation to whatever initial_facing_direction is
+	if initial_facing_direction:
+		HEAD.set_rotation_degrees(initial_facing_direction) # I don't want to be calling this function if the vector is zero
 	
 	# Reset the camera position
 	CAMERA_ANIMATION.play("RESET")

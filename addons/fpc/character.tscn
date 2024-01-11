@@ -123,7 +123,6 @@ shape = SubResource("CapsuleShape3D_uy03j")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 
 [node name="Camera" type="Camera3D" parent="Head"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="camera_animation" type="AnimationPlayer" parent="Head"]
 libraries = {
