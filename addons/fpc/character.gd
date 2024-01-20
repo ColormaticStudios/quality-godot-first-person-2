@@ -54,6 +54,7 @@ extends CharacterBody3D
 
 # Member variables
 var speed : float = base_speed
+var current_speed : float = 0.0
 # States: normal, crouching, sprinting
 var state : String = "normal"
 var low_ceiling : bool = false # This is for when the cieling is too low and the player needs to crouch.
@@ -76,8 +77,9 @@ func _ready():
 
 
 func _physics_process(delta):
-	# Add some debug data
-	$UserInterface/DebugPanel.add_property("Movement Speed", speed, 1)
+	current_speed = Vector3.ZERO.distance_to(get_real_velocity())
+	$UserInterface/DebugPanel.add_property("Speed", snappedf(current_speed, 0.001), 1)
+	$UserInterface/DebugPanel.add_property("Target speed", speed, 2)
 	var cv : Vector3 = get_real_velocity()
 	var vd : Array[float] = [
 		snappedf(cv.x, 0.001),
@@ -85,7 +87,7 @@ func _physics_process(delta):
 		snappedf(cv.z, 0.001)
 	]
 	var readable_velocity : String = "X: " + str(vd[0]) + " Y: " + str(vd[1]) + " Z: " + str(vd[2])
-	$UserInterface/DebugPanel.add_property("Velocity", readable_velocity, 2)
+	$UserInterface/DebugPanel.add_property("Velocity", readable_velocity, 3)
 	
 	# Gravity
 	#gravity = ProjectSettings.get_setting("physics/3d/default_gravity") # If the gravity changes during your game, uncomment this code
@@ -227,7 +229,7 @@ func update_camera_fov():
 func headbob_animation(moving):
 	if moving and is_on_floor():
 		HEADBOB_ANIMATION.play("headbob", 0.25)
-		HEADBOB_ANIMATION.speed_scale = (speed / base_speed) * 1.75
+		HEADBOB_ANIMATION.speed_scale = (current_speed / base_speed) * 1.75
 	else:
 		HEADBOB_ANIMATION.play("RESET", 0.25)
 
@@ -237,7 +239,7 @@ func _process(delta):
 	var status : String = state
 	if !is_on_floor():
 		status += " in the air"
-	$UserInterface/DebugPanel.add_property("State", status, 0)
+	$UserInterface/DebugPanel.add_property("State", status, 4)
 	
 	if Input.is_action_just_pressed(PAUSE):
 		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
