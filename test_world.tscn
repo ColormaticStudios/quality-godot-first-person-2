@@ -45,5 +45,5 @@ environment = SubResource("Environment_20rw3")
 
 [node name="sun" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.87959, -0.436605, 0.188936, 0, 0.397148, 0.917755, -0.475732, -0.807248, 0.349328, 0, 0, 0)
-light_energy = 4.0
+light_energy = 2.0
 shadow_enabled = true
