@@ -18,6 +18,7 @@ extends CharacterBody3D
 @export var CAMERA : Camera3D
 @export var HEADBOB_ANIMATION : AnimationPlayer
 @export var JUMP_ANIMATION : AnimationPlayer
+@export var CROUCH_ANIMATION : AnimationPlayer
 @export var COLLISION_MESH : CollisionShape3D
 
 @export_group("Controls")
@@ -103,7 +104,6 @@ func _physics_process(delta):
 	handle_state(input_dir)
 	if dynamic_fov:
 		update_camera_fov()
-	update_collision_scale()
 	
 	if view_bobbing:
 		headbob_animation(input_dir)
@@ -154,7 +154,7 @@ func handle_movement(delta, input_dir):
 func handle_state(moving):
 	if sprint_enabled:
 		if sprint_mode == 0:
-			if Input.is_action_pressed(SPRINT) and !Input.is_action_pressed(CROUCH):
+			if Input.is_action_pressed(SPRINT) and state != "crouching":
 				if moving:
 					if state != "sprinting":
 						enter_sprint_state()
@@ -196,6 +196,8 @@ func handle_state(moving):
 func enter_normal_state():
 	#print("entering normal state")
 	var prev_state = state
+	if prev_state == "crouching":
+		CROUCH_ANIMATION.play_backwards("crouch")
 	state = "normal"
 	speed = base_speed
 
@@ -204,10 +206,13 @@ func enter_crouch_state():
 	var prev_state = state
 	state = "crouching"
 	speed = crouch_speed
+	CROUCH_ANIMATION.play("crouch")
 
 func enter_sprint_state():
 	#print("entering sprint state")
 	var prev_state = state
+	if prev_state == "crouching":
+		CROUCH_ANIMATION.play_backwards("crouch")
 	state = "sprinting"
 	speed = sprint_speed
 
@@ -217,13 +222,6 @@ func update_camera_fov():
 		CAMERA.fov = lerp(CAMERA.fov, 85.0, 0.3)
 	else:
 		CAMERA.fov = lerp(CAMERA.fov, 75.0, 0.3)
-
-
-func update_collision_scale():
-	if state == "crouching": # Add your own crouch animation code
-		COLLISION_MESH.scale.y = lerp(COLLISION_MESH.scale.y, 0.75, 0.2)
-	else:
-		COLLISION_MESH.scale.y = lerp(COLLISION_MESH.scale.y, 1.0, 0.2)
 
 
 func headbob_animation(moving):
