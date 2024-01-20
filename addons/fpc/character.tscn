@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://cc1m2a1obsyn4"]
+[gd_scene load_steps=15 format=3 uid="uid://cc1m2a1obsyn4"]
 
 [ext_resource type="Script" path="res://addons/fpc/character.gd" id="1_0t4e8"]
 [ext_resource type="PackedScene" uid="uid://3mij3cjhkwsm" path="res://addons/fpc/reticles/reticle_1.tscn" id="2_uuexm"]
@@ -96,17 +96,70 @@ _data = {
 "headbob": SubResource("Animation_lrqmv")
 }
 
+[sub_resource type="Animation" id="Animation_s07ye"]
+resource_name = "jump"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Camera:rotation")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5, 1),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0.0349066, 0, 0), Vector3(0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_fvvjq"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Camera:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0.0349066, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_vsknp"]
+resource_name = "land"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Camera:rotation")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5, 1),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(-0.0349066, 0, 0), Vector3(0, 0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_qeg5r"]
+_data = {
+"RESET": SubResource("Animation_fvvjq"),
+"jump": SubResource("Animation_s07ye"),
+"land": SubResource("Animation_vsknp")
+}
+
 [sub_resource type="Theme" id="Theme_wdf0f"]
 MarginContainer/constants/margin_bottom = 10
 MarginContainer/constants/margin_left = 10
 MarginContainer/constants/margin_right = 10
 MarginContainer/constants/margin_top = 10
 
-[node name="Character" type="CharacterBody3D" node_paths=PackedStringArray("HEAD", "CAMERA", "CAMERA_ANIMATION", "COLLISION_MESH")]
+[node name="Character" type="CharacterBody3D" node_paths=PackedStringArray("HEAD", "CAMERA", "HEADBOB_ANIMATION", "JUMP_ANIMATION", "COLLISION_MESH")]
 script = ExtResource("1_0t4e8")
 HEAD = NodePath("Head")
 CAMERA = NodePath("Head/Camera")
-CAMERA_ANIMATION = NodePath("Head/camera_animation")
+HEADBOB_ANIMATION = NodePath("Head/HeadbobAnimation")
+JUMP_ANIMATION = NodePath("Head/JumpAnimation")
 COLLISION_MESH = NodePath("Collision")
 CROUCH = "crouch"
 SPRINT = "sprint"
@@ -123,12 +176,19 @@ shape = SubResource("CapsuleShape3D_uy03j")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 
 [node name="Camera" type="Camera3D" parent="Head"]
+transform = Transform3D(1, 0, 0, 0, 0.999391, -0.0348995, 0, 0.0348995, 0.999391, 0, 0, 0)
 
-[node name="camera_animation" type="AnimationPlayer" parent="Head"]
+[node name="HeadbobAnimation" type="AnimationPlayer" parent="Head"]
 libraries = {
 "": SubResource("AnimationLibrary_o0unb")
 }
 blend_times = [&"RESET", &"RESET", 0.5, &"RESET", &"headbob", 0.5, &"headbob", &"RESET", 0.5]
+
+[node name="JumpAnimation" type="AnimationPlayer" parent="Head"]
+libraries = {
+"": SubResource("AnimationLibrary_qeg5r")
+}
+speed_scale = 4.0
 
 [node name="UserInterface" type="Control" parent="."]
 layout_mode = 3

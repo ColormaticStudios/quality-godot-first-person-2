@@ -16,7 +16,8 @@ extends CharacterBody3D
 @export_group("Nodes")
 @export var HEAD : Node3D
 @export var CAMERA : Camera3D
-@export var CAMERA_ANIMATION : AnimationPlayer
+@export var HEADBOB_ANIMATION : AnimationPlayer
+@export var JUMP_ANIMATION : AnimationPlayer
 @export var COLLISION_MESH : CollisionShape3D
 
 @export_group("Controls")
@@ -48,12 +49,14 @@ extends CharacterBody3D
 @export var dynamic_fov : bool = true
 @export var continuous_jumping : bool = true
 @export var view_bobbing : bool = true
+@export var jump_animation : bool = true
 
 # Member variables
 var speed : float = base_speed
 # States: normal, crouching, sprinting
 var state : String = "normal"
 var low_ceiling : bool = false # This is for when the cieling is too low and the player needs to crouch.
+var was_on_floor : bool = true
 
 # Get the gravity from the project settings to be synced with RigidBody nodes
 var gravity : float = ProjectSettings.get_setting("physics/3d/default_gravity") # Don't set this as a const, see the gravity section in _physics_process
@@ -67,7 +70,8 @@ func _ready():
 		HEAD.set_rotation_degrees(initial_facing_direction) # I don't want to be calling this function if the vector is zero
 	
 	# Reset the camera position
-	CAMERA_ANIMATION.play("RESET")
+	HEADBOB_ANIMATION.play("RESET")
+	JUMP_ANIMATION.play("RESET")
 
 
 func _physics_process(delta):
@@ -103,15 +107,25 @@ func _physics_process(delta):
 	
 	if view_bobbing:
 		headbob_animation(input_dir)
+	
+	if jump_animation:
+		if !was_on_floor and is_on_floor(): # Just landed
+			JUMP_ANIMATION.play("land")
+		
+		was_on_floor = is_on_floor() # This must always be at the end of physics_process
 
 
 func handle_jumping():
 	if jumping_enabled:
 		if continuous_jumping:
 			if Input.is_action_pressed(JUMP) and is_on_floor():
+				if jump_animation:
+					JUMP_ANIMATION.play("jump")
 				velocity.y += jump_velocity
 		else:
 			if Input.is_action_just_pressed(JUMP) and is_on_floor():
+				if jump_animation:
+					JUMP_ANIMATION.play("jump")
 				velocity.y += jump_velocity
 
 
@@ -214,10 +228,10 @@ func update_collision_scale():
 
 func headbob_animation(moving):
 	if moving and is_on_floor():
-		CAMERA_ANIMATION.play("headbob", 0.25)
-		CAMERA_ANIMATION.speed_scale = (speed / base_speed) * 1.75
+		HEADBOB_ANIMATION.play("headbob", 0.25)
+		HEADBOB_ANIMATION.speed_scale = (speed / base_speed) * 1.75
 	else:
-		CAMERA_ANIMATION.play("RESET", 0.25)
+		HEADBOB_ANIMATION.play("RESET", 0.25)
 
 
 func _process(delta):
