@@ -232,6 +232,7 @@ func headbob_animation(moving):
 		HEADBOB_ANIMATION.speed_scale = (current_speed / base_speed) * 1.75
 	else:
 		HEADBOB_ANIMATION.play("RESET", 0.25)
+		HEADBOB_ANIMATION.speed_scale = 1
 
 
 func _process(delta):
