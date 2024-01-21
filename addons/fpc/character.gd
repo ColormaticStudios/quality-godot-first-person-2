@@ -228,8 +228,14 @@ func update_camera_fov():
 
 func headbob_animation(moving):
 	if moving and is_on_floor():
+		var was_playing : bool = false
+		if HEADBOB_ANIMATION.current_animation == "headbob":
+			was_playing = true
 		HEADBOB_ANIMATION.play("headbob", 0.25)
 		HEADBOB_ANIMATION.speed_scale = (current_speed / base_speed) * 1.75
+		if !was_playing:
+			HEADBOB_ANIMATION.seek(float(randi() % 2)) # Randomize the initial headbob direction
+		
 	else:
 		HEADBOB_ANIMATION.play("RESET", 0.25)
 		HEADBOB_ANIMATION.speed_scale = 1
