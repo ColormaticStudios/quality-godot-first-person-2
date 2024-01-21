@@ -167,6 +167,9 @@ func handle_state(moving):
 				enter_normal_state()
 		elif sprint_mode == 1:
 			if moving:
+				# If the player is holding sprint before moving, handle that cenerio
+				if Input.is_action_pressed(SPRINT) and state == "normal":
+					enter_sprint_state()
 				if Input.is_action_just_pressed(SPRINT):
 					match state:
 						"normal":
@@ -178,7 +181,7 @@ func handle_state(moving):
 	
 	if crouch_enabled:
 		if crouch_mode == 0:
-			if Input.is_action_pressed(CROUCH) and !Input.is_action_pressed(SPRINT):
+			if Input.is_action_pressed(CROUCH) and state != "sprinting":
 				if state != "crouching":
 					enter_crouch_state()
 			elif state == "crouching" and !$CrouchCeilingDetection.is_colliding():
