@@ -120,12 +120,12 @@ func _physics_process(delta):
 func handle_jumping():
 	if jumping_enabled:
 		if continuous_jumping:
-			if Input.is_action_pressed(JUMP) and is_on_floor():
+			if Input.is_action_pressed(JUMP) and is_on_floor() and !low_ceiling:
 				if jump_animation:
 					JUMP_ANIMATION.play("jump")
 				velocity.y += jump_velocity
 		else:
-			if Input.is_action_just_pressed(JUMP) and is_on_floor():
+			if Input.is_action_just_pressed(JUMP) and is_on_floor() and !low_ceiling:
 				if jump_animation:
 					JUMP_ANIMATION.play("jump")
 				velocity.y += jump_velocity
