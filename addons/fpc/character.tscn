@@ -90,7 +90,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector3(0, 0.75, 0)]
+"values": [Vector3(0, 1, 0)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -265,7 +265,7 @@ CROUCH = "crouch"
 SPRINT = "sprint"
 
 [node name="Mesh" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 mesh = SubResource("CapsuleMesh_jw1de")
 
 [node name="Collision" type="CollisionShape3D" parent="."]
