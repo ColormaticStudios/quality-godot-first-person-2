@@ -14,6 +14,33 @@ material = SubResource("StandardMaterial3D_kp17n")
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_uy03j"]
 
+[sub_resource type="Animation" id="Animation_pqev3"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Mesh:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 1, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Head:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 1.5, 0)]
+}
+
 [sub_resource type="Animation" id="Animation_5ec5e"]
 resource_name = "crouch"
 length = 0.2
@@ -76,33 +103,6 @@ tracks/4/keys = {
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Vector3(0, 1.5, 0), Vector3(0, 1.12508, 0)]
-}
-
-[sub_resource type="Animation" id="Animation_pqev3"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Mesh:position")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector3(0, 1, 0)]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Head:position")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector3(0, 1.5, 0)]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_5e5t5"]
@@ -172,7 +172,7 @@ tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "handle_modes": PackedInt32Array(0, 0, 0, 0, 0),
-"points": PackedFloat32Array(-0.05, -0.25, 0, 0.2, 0.005, 0, -0.25, 0, 0.25, 0, -0.05, -0.2, 0.005, 0.2, 0.005, 0, -0.25, 0, 0.25, 0, -0.05, -0.2, 0.005, 0.25, 0),
+"points": PackedFloat32Array(-0.05, -0.25, 0, 0.2, 0.005, 0, -0.2, 0.000186046, 0.2, 0.000186046, -0.05, -0.2, 0.005, 0.2, 0.005, 0, -0.2, 0, 0.2, 0, -0.05, -0.2, 0.005, 0.25, 0),
 "times": PackedFloat32Array(0, 0.5, 1, 1.5, 2)
 }
 tracks/2/type = "bezier"

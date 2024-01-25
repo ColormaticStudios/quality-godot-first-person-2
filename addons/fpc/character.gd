@@ -238,6 +238,9 @@ func headbob_animation(moving):
 		HEADBOB_ANIMATION.speed_scale = (current_speed / base_speed) * 1.75
 		if !was_playing:
 			HEADBOB_ANIMATION.seek(float(randi() % 2)) # Randomize the initial headbob direction
+			# Let me explain that piece of code because it looks like it does the opposite of what it actually does.
+			# The headbob animation has two starting positions. One is at 0 and the other is at 1.
+			# randi() % 2 returns either 0 or 1, and so the animation randomly starts at one of the starting positions.
 		
 	else:
 		HEADBOB_ANIMATION.play("RESET", 0.25)
