@@ -10,6 +10,7 @@ extends CharacterBody3D
 @export var acceleration : float = 10.0
 @export var jump_velocity : float = 4.5
 @export var mouse_sensitivity : float = 0.1
+@export var immobile : bool = false
 
 @export var initial_facing_direction : Vector3 = Vector3.ZERO
 
@@ -39,7 +40,6 @@ extends CharacterBody3D
 #@export var LOOK_DOWN : String
 
 @export_group("Feature Settings")
-@export var immobile : bool = false
 @export var jumping_enabled : bool = true
 @export var in_air_momentum : bool = true
 @export var motion_smoothing : bool = true
