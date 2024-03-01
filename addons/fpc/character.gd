@@ -112,7 +112,11 @@ func _physics_process(delta):
 	
 	if jump_animation:
 		if !was_on_floor and is_on_floor(): # Just landed
-			JUMP_ANIMATION.play("land")
+			match randi() % 2:
+				0:
+					JUMP_ANIMATION.play("land_left")
+				1:
+					JUMP_ANIMATION.play("land_right")
 		
 		was_on_floor = is_on_floor() # This must always be at the end of physics_process
 
@@ -231,16 +235,25 @@ func update_camera_fov():
 
 func headbob_animation(moving):
 	if moving and is_on_floor():
+		var use_headbob_animation : String
+		match state:
+			"normal","crouching":
+				use_headbob_animation = "walk"
+			"sprinting":
+				use_headbob_animation = "sprint"
+		
 		var was_playing : bool = false
-		if HEADBOB_ANIMATION.current_animation == "headbob":
+		if HEADBOB_ANIMATION.current_animation == use_headbob_animation:
 			was_playing = true
-		HEADBOB_ANIMATION.play("headbob", 0.25)
+		
+		HEADBOB_ANIMATION.play(use_headbob_animation, 0.25)
 		HEADBOB_ANIMATION.speed_scale = (current_speed / base_speed) * 1.75
 		if !was_playing:
 			HEADBOB_ANIMATION.seek(float(randi() % 2)) # Randomize the initial headbob direction
 			# Let me explain that piece of code because it looks like it does the opposite of what it actually does.
 			# The headbob animation has two starting positions. One is at 0 and the other is at 1.
 			# randi() % 2 returns either 0 or 1, and so the animation randomly starts at one of the starting positions.
+			# This code is extremely performant but it makes no sense.
 		
 	else:
 		HEADBOB_ANIMATION.play("RESET", 0.25)
