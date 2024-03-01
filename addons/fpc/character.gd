@@ -74,6 +74,7 @@ func _ready():
 	# Reset the camera position
 	HEADBOB_ANIMATION.play("RESET")
 	JUMP_ANIMATION.play("RESET")
+	CROUCH_ANIMATION.play("RESET")
 
 
 func _physics_process(delta):
