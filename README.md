@@ -43,7 +43,7 @@ Click on the character node and there should be settings in the "Feature Setting
 - Use the `state` member variable to tell if the player is sprinting or crouching.
 - Use the `is_on_floor` function to tell if the player is standing or falling.
 
-**How to change reticles (crosshairs):**
+**How to change reticles (crosshairs):**  
 Change the "Default Reticle" setting to your reticle file.  
 During runtime:  
 Use the `change_reticle` function on the character.
