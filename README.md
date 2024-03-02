@@ -14,7 +14,7 @@ Move with WASD, space to jump, shift to sprint, C to crouch.
  - In-air momentum
  - Motion smoothing
  - FOV smoothing
- - Head bobbing
+ - Movement animations
  - Crouching
  - Sprinting
  - 2 crosshairs/reticles, one is animated (more to come?)
@@ -43,11 +43,10 @@ Click on the character node and there should be settings in the "Feature Setting
 - Use the `state` member variable to tell if the player is sprinting or crouching.
 - Use the `is_on_floor` function to tell if the player is standing or falling.
 
-**How to change reticles (crosshairs):**  
-- Find the folder at `res://addons/fpc/reticles`.
-- Pick one and add it to the `UserInterface` node in the character scene. You may need to right click on the character and enable "Editable Children".
-- Set the Character value to your character node. (it's under the Nodes group)
-- Change the `anchors_preset` value on the reticle to Center.
+**How to change reticles (crosshairs):**
+Change the "Default Reticle" setting to your reticle file.  
+During runtime:  
+Use the `change_reticle` function on the character.
 
 **How to create a new reticle:**  
 - Choose a reticle to base it off of.
@@ -55,4 +54,3 @@ Click on the character node and there should be settings in the "Feature Setting
 - Remove the script from the reticle and create a new one. (for some reason you have to do this)
 - Edit the reticle to your needs.
 - Follow the "how to change reticles" directions to use it.
-
