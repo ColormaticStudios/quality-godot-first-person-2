@@ -11,6 +11,7 @@ extends CharacterBody3D
 @export var jump_velocity : float = 4.5
 @export var mouse_sensitivity : float = 0.1
 @export var immobile : bool = false
+@export_file var default_reticle
 
 @export var initial_facing_direction : Vector3 = Vector3.ZERO
 
@@ -60,6 +61,8 @@ var state : String = "normal"
 var low_ceiling : bool = false # This is for when the cieling is too low and the player needs to crouch.
 var was_on_floor : bool = true
 
+var RETICLE : Control
+
 # Get the gravity from the project settings to be synced with RigidBody nodes
 var gravity : float = ProjectSettings.get_setting("physics/3d/default_gravity") # Don't set this as a const, see the gravity section in _physics_process
 
@@ -71,10 +74,22 @@ func _ready():
 	if initial_facing_direction:
 		HEAD.set_rotation_degrees(initial_facing_direction) # I don't want to be calling this function if the vector is zero
 	
+	if default_reticle:
+		change_reticle(default_reticle)
+	
 	# Reset the camera position
 	HEADBOB_ANIMATION.play("RESET")
 	JUMP_ANIMATION.play("RESET")
 	CROUCH_ANIMATION.play("RESET")
+
+
+func change_reticle(reticle):
+	if RETICLE:
+		RETICLE.queue_free()
+	
+	RETICLE = load(reticle).instantiate()
+	RETICLE.character = self
+	$UserInterface.add_child(RETICLE)
 
 
 func _physics_process(delta):

@@ -73,7 +73,7 @@ func update_reticle_settings():
 	reticle_lines[3].points[1].y = line_length + line_distance
 "
 
-[node name="Reticle" type="CenterContainer"]
+[node name="Reticle" type="CenterContainer" node_paths=PackedStringArray("reticle_lines")]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -82,6 +82,7 @@ anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
 script = SubResource("GDScript_a8kpl")
+reticle_lines = [NodePath("top"), NodePath("left"), NodePath("right"), NodePath("bottom")]
 
 [node name="dot" type="Polygon2D" parent="."]
 polygon = PackedVector2Array(-1, -1, 1, -1, 1, 1, -1, 1)
