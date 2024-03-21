@@ -52,6 +52,7 @@ extends CharacterBody3D
 @export var continuous_jumping : bool = true
 @export var view_bobbing : bool = true
 @export var jump_animation : bool = true
+@export var pausing_enabled : bool = true
 
 # Member variables
 var speed : float = base_speed
@@ -81,6 +82,34 @@ func _ready():
 	HEADBOB_ANIMATION.play("RESET")
 	JUMP_ANIMATION.play("RESET")
 	CROUCH_ANIMATION.play("RESET")
+	
+	check_controls()
+
+func check_controls(): # If you add a control, you might want to add a check for it here.
+	if !InputMap.has_action(JUMP):
+		push_error("No control mapped for jumping. Please add an input map control. Disabling jump.")
+		jumping_enabled = false
+	if !InputMap.has_action(LEFT):
+		push_error("No control mapped for move left. Please add an input map control. Disabling movement.")
+		immobile = true
+	if !InputMap.has_action(RIGHT):
+		push_error("No control mapped for move right. Please add an input map control. Disabling movement.")
+		immobile = true
+	if !InputMap.has_action(FORWARD):
+		push_error("No control mapped for move forward. Please add an input map control. Disabling movement.")
+		immobile = true
+	if !InputMap.has_action(BACKWARD):
+		push_error("No control mapped for move backward. Please add an input map control. Disabling movement.")
+		immobile = true
+	if !InputMap.has_action(PAUSE):
+		push_error("No control mapped for move pause. Please add an input map control. Disabling pausing.")
+		pausing_enabled = false
+	if !InputMap.has_action(CROUCH):
+		push_error("No control mapped for crouch. Please add an input map control. Disabling crouching.")
+		crouch_enabled = false
+	if !InputMap.has_action(SPRINT):
+		push_error("No control mapped for sprint. Please add an input map control. Disabling sprinting.")
+		sprint_enabled = false
 
 
 func change_reticle(reticle):
@@ -283,11 +312,12 @@ func _process(delta):
 		status += " in the air"
 	$UserInterface/DebugPanel.add_property("State", status, 4)
 	
-	if Input.is_action_just_pressed(PAUSE):
-		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-		elif Input.mouse_mode == Input.MOUSE_MODE_VISIBLE:
-			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	if pausing_enabled:
+		if Input.is_action_just_pressed(PAUSE):
+			if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+				Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+			elif Input.mouse_mode == Input.MOUSE_MODE_VISIBLE:
+				Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	
 	HEAD.rotation.x = clamp(HEAD.rotation.x, deg_to_rad(-90), deg_to_rad(90))
 	
