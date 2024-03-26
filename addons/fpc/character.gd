@@ -13,8 +13,6 @@ extends CharacterBody3D
 @export var immobile : bool = false
 @export_file var default_reticle
 
-@export var initial_facing_direction : Vector3 = Vector3.ZERO
-
 @export_group("Nodes")
 @export var HEAD : Node3D
 @export var CAMERA : Camera3D
@@ -71,9 +69,8 @@ var gravity : float = ProjectSettings.get_setting("physics/3d/default_gravity") 
 func _ready():
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	
-	# Set the camera rotation to whatever initial_facing_direction is
-	if initial_facing_direction:
-		HEAD.set_rotation_degrees(initial_facing_direction) # I don't want to be calling this function if the vector is zero
+	HEAD.rotation = rotation
+	rotation = Vector3.ZERO
 	
 	if default_reticle:
 		change_reticle(default_reticle)
