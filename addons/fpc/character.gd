@@ -156,9 +156,9 @@ func _physics_process(delta):
 		if !was_on_floor and is_on_floor(): # Just landed
 			match randi() % 2:
 				0:
-					JUMP_ANIMATION.play("land_left")
+					JUMP_ANIMATION.play("land_left", 0.25)
 				1:
-					JUMP_ANIMATION.play("land_right")
+					JUMP_ANIMATION.play("land_right", 0.25)
 		
 		was_on_floor = is_on_floor() # This must always be at the end of physics_process
 
@@ -168,12 +168,12 @@ func handle_jumping():
 		if continuous_jumping:
 			if Input.is_action_pressed(JUMP) and is_on_floor() and !low_ceiling:
 				if jump_animation:
-					JUMP_ANIMATION.play("jump")
+					JUMP_ANIMATION.play("jump", 0.25)
 				velocity.y += jump_velocity
 		else:
 			if Input.is_action_just_pressed(JUMP) and is_on_floor() and !low_ceiling:
 				if jump_animation:
-					JUMP_ANIMATION.play("jump")
+					JUMP_ANIMATION.play("jump", 0.25)
 				velocity.y += jump_velocity
 
 
