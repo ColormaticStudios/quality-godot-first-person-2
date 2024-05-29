@@ -11,14 +11,16 @@ Some parts came from StayAtHomeDev's FPS tutorial. You can find that [here](http
 Move with WASD, space to jump, shift to sprint, C to crouch.
 
 **FEATURES:**
- - In-air momentum
- - Motion smoothing
- - FOV smoothing
- - Movement animations
- - Crouching
- - Sprinting
- - 2 crosshairs/reticles, one is animated (more to come?)
- - Controller/GamePad support (enabled through code, see wiki)
+- Extremely configurable
+- In-air momentum
+- Motion smoothing
+- FOV smoothing
+- Movement animations
+- Crouching
+- Sprinting
+- 2 crosshairs/reticles, one is animated (more to come?)
+- Controller/GamePad support (enabled through code, see wiki)
+- In-editor tools (enable editable children to use)
 
 If you make a cool game with this addon, I would love to hear about it!
 
@@ -54,3 +56,8 @@ Use the `change_reticle` function on the character.
 - Remove the script from the reticle and create a new one. (for some reason you have to do this)
 - Edit the reticle to your needs.
 - Follow the "how to change reticles" directions to use it.
+
+**How to use the editor tools:**  
+- Enable editable children on the `CharacterBody` node
+- Use the options in the Properties tab to change things
+- These changes apply in runtime as well
