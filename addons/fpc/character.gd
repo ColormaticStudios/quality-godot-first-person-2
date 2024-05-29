@@ -327,10 +327,11 @@ func _process(delta):
 	
 	if pausing_enabled:
 		if Input.is_action_just_pressed(PAUSE):
-			if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-				Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-			elif Input.mouse_mode == Input.MOUSE_MODE_VISIBLE:
-				Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+			match Input.mouse_mode:
+				Input.MOUSE_MODE_CAPTURED:
+					Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+				Input.MOUSE_MODE_VISIBLE:
+					Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	
 	HEAD.rotation.x = clamp(HEAD.rotation.x, deg_to_rad(-90), deg_to_rad(90))
 	
