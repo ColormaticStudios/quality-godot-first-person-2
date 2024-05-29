@@ -1,3 +1,9 @@
+
+# COPYRIGHT Colormatic Studios
+# MIT licence
+# Quality Godot First Person Controller v2
+
+
 extends CharacterBody3D
 
 # TODO: Add descriptions for each value
