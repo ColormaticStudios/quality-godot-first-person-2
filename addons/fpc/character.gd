@@ -8,6 +8,7 @@ extends CharacterBody3D
 
 # TODO: Add descriptions for each value
 
+
 @export_category("Character")
 @export var base_speed : float = 3.0
 @export var sprint_speed : float = 6.0
@@ -66,8 +67,9 @@ var current_speed : float = 0.0
 # States: normal, crouching, sprinting
 var state : String = "normal"
 var low_ceiling : bool = false # This is for when the cieling is too low and the player needs to crouch.
-var was_on_floor : bool = true
+var was_on_floor : bool = true # Was the player on the floor last frame (for landing animation)
 
+# The reticle should always have a Control node as the root
 var RETICLE : Control
 
 # Get the gravity from the project settings to be synced with RigidBody nodes
@@ -75,15 +77,18 @@ var gravity : float = ProjectSettings.get_setting("physics/3d/default_gravity") 
 
 
 func _ready():
+	#It is safe to comment this line if your game doesn't start with the mouse captured
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	
 	HEAD.rotation = rotation
 	rotation = Vector3.ZERO
+	# If the controller is rotated in a certain direction for game design purposes, redirect this rotation into the head.
 	
 	if default_reticle:
 		change_reticle(default_reticle)
 	
 	# Reset the camera position
+	# If you want to change the default head height, change these animations.
 	HEADBOB_ANIMATION.play("RESET")
 	JUMP_ANIMATION.play("RESET")
 	CROUCH_ANIMATION.play("RESET")
@@ -117,7 +122,7 @@ func check_controls(): # If you add a control, you might want to add a check for
 		sprint_enabled = false
 
 
-func change_reticle(reticle):
+func change_reticle(reticle): # Yup, this function is kinda strange
 	if RETICLE:
 		RETICLE.queue_free()
 	
@@ -127,6 +132,7 @@ func change_reticle(reticle):
 
 
 func _physics_process(delta):
+	# Big thanks to github.com/LorenzoAncora for the concept of the improved debug values
 	current_speed = Vector3.ZERO.distance_to(get_real_velocity())
 	$UserInterface/DebugPanel.add_property("Speed", snappedf(current_speed, 0.001), 1)
 	$UserInterface/DebugPanel.add_property("Target speed", speed, 2)
@@ -147,37 +153,38 @@ func _physics_process(delta):
 	handle_jumping()
 	
 	var input_dir = Vector2.ZERO
-	if !immobile:
+	if !immobile: # Immobility works by interrupting user input, so other forces can still be applied to the player
 		input_dir = Input.get_vector(LEFT, RIGHT, FORWARD, BACKWARD)
 	handle_movement(delta, input_dir)
 	
+	# The player is not able to stand up if the ceiling is too low
 	low_ceiling = $CrouchCeilingDetection.is_colliding()
 	
 	handle_state(input_dir)
-	if dynamic_fov:
+	if dynamic_fov: # This may be changed to an AnimationPlayer
 		update_camera_fov()
 	
 	if view_bobbing:
 		headbob_animation(input_dir)
 	
 	if jump_animation:
-		if !was_on_floor and is_on_floor(): # Just landed
-			match randi() % 2:
+		if !was_on_floor and is_on_floor(): # The player just landed
+			match randi() % 2: #TODO: Change this to detecting velocity direction
 				0:
 					JUMP_ANIMATION.play("land_left", 0.25)
 				1:
 					JUMP_ANIMATION.play("land_right", 0.25)
-		
-		was_on_floor = is_on_floor() # This must always be at the end of physics_process
+	
+	was_on_floor = is_on_floor() # This must always be at the end of physics_process
 
 
 func handle_jumping():
 	if jumping_enabled:
-		if continuous_jumping:
+		if continuous_jumping: # Hold down the jump button
 			if Input.is_action_pressed(JUMP) and is_on_floor() and !low_ceiling:
 				if jump_animation:
 					JUMP_ANIMATION.play("jump", 0.25)
-				velocity.y += jump_velocity
+				velocity.y += jump_velocity # Adding instead of setting so jumping on slopes works properly
 		else:
 			if Input.is_action_just_pressed(JUMP) and is_on_floor() and !low_ceiling:
 				if jump_animation:
