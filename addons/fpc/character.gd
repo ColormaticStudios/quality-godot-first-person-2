@@ -313,9 +313,10 @@ func headbob_animation(moving):
 			# This code is extremely performant but it makes no sense.
 		
 	else:
-		if HEADBOB_ANIMATION.is_playing():
-			HEADBOB_ANIMATION.play("RESET", 0.25)
+		if HEADBOB_ANIMATION.current_animation == "sprint" or HEADBOB_ANIMATION.current_animation == "walk":
+			print("reset here")
 			HEADBOB_ANIMATION.speed_scale = 1
+			HEADBOB_ANIMATION.play("RESET", 1)
 
 
 func _process(delta):

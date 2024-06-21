@@ -65,9 +65,6 @@ uv1_triplanar_sharpness = 0.000850145
 [node name="Character" parent="." instance=ExtResource("1_e18vq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 
-[node name="Camera" parent="Character/Head" index="0"]
-transform = Transform3D(1, 0, 0, 0, 0.999391, -0.0348995, 0, 0.0348995, 0.999391, 0, 0, 0)
-
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_20rw3")
 
@@ -107,5 +104,3 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 3, -15.5)
 use_collision = true
 size = Vector3(19, 8, 1)
 material = SubResource("StandardMaterial3D_7j4uu")
-
-[editable path="Character"]
