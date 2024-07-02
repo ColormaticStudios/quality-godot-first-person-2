@@ -36,8 +36,8 @@ extends CharacterBody3D
 @export var FORWARD : String = "ui_up"
 @export var BACKWARD : String = "ui_down"
 @export var PAUSE : String = "ui_cancel"
-@export var CROUCH : String
-@export var SPRINT : String
+@export var CROUCH : String = "crouch"
+@export var SPRINT : String = "sprint"
 
 # Uncomment if you want full controller support
 #@export var LOOK_LEFT : String
