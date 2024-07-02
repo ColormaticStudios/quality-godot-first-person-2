@@ -314,7 +314,6 @@ func headbob_animation(moving):
 		
 	else:
 		if HEADBOB_ANIMATION.current_animation == "sprint" or HEADBOB_ANIMATION.current_animation == "walk":
-			print("reset here")
 			HEADBOB_ANIMATION.speed_scale = 1
 			HEADBOB_ANIMATION.play("RESET", 1)
 
