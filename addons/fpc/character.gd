@@ -112,7 +112,7 @@ func check_controls(): # If you add a control, you might want to add a check for
 		push_error("No control mapped for move backward. Please add an input map control. Disabling movement.")
 		immobile = true
 	if !InputMap.has_action(PAUSE):
-		push_error("No control mapped for move pause. Please add an input map control. Disabling pausing.")
+		push_error("No control mapped for pause. Please add an input map control. Disabling pausing.")
 		pausing_enabled = false
 	if !InputMap.has_action(CROUCH):
 		push_error("No control mapped for crouch. Please add an input map control. Disabling crouching.")
