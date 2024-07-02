@@ -96,6 +96,7 @@ func _ready():
 	check_controls()
 
 func check_controls(): # If you add a control, you might want to add a check for it here.
+	# The actions are being disabled so the engine doesn't halt the entire project in debug mode
 	if !InputMap.has_action(JUMP):
 		push_error("No control mapped for jumping. Please add an input map control. Disabling jump.")
 		jumping_enabled = false
