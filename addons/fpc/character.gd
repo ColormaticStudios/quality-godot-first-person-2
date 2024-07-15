@@ -40,10 +40,10 @@ extends CharacterBody3D
 @export var SPRINT : String = "sprint"
 
 # Uncomment if you want full controller support
-#@export var LOOK_LEFT : String
-#@export var LOOK_RIGHT : String
-#@export var LOOK_UP : String
-#@export var LOOK_DOWN : String
+#@export var LOOK_LEFT : String = "look_left"
+#@export var LOOK_RIGHT : String = "look_right"
+#@export var LOOK_UP : String = "look_up"
+#@export var LOOK_DOWN : String = "look_down"
 
 @export_group("Feature Settings")
 @export var jumping_enabled : bool = true
@@ -221,8 +221,13 @@ func handle_movement(delta, input_dir):
 func handle_head_rotation():
 	HEAD.rotation_degrees.y -= mouseInput.x * mouse_sensitivity
 	HEAD.rotation_degrees.x -= mouseInput.y * mouse_sensitivity
-	mouseInput = Vector2(0,0)
 	
+	# Uncomment for controller support
+	#var controller_view_rotation = Input.get_vector(LOOK_DOWN, LOOK_UP, LOOK_RIGHT, LOOK_LEFT) * 0.035 # These are inverted because of the nature of 3D rotation.
+	#HEAD.rotation.x += controller_view_rotation.x
+	#HEAD.rotation.y += controller_view_rotation.y
+	
+	mouseInput = Vector2(0,0)
 	HEAD.rotation.x = clamp(HEAD.rotation.x, deg_to_rad(-90), deg_to_rad(90))
 
 
@@ -344,11 +349,6 @@ func _process(delta):
 					Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 				Input.MOUSE_MODE_VISIBLE:
 					Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	
-	# Uncomment if you want full controller support
-	#var controller_view_rotation = Input.get_vector(LOOK_LEFT, LOOK_RIGHT, LOOK_UP, LOOK_DOWN)
-	#HEAD.rotation_degrees.y -= controller_view_rotation.x * 1.5
-	#HEAD.rotation_degrees.x -= controller_view_rotation.y * 1.5
 
 
 func _unhandled_input(event):
