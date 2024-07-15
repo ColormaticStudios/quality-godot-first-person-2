@@ -75,6 +75,8 @@ var RETICLE : Control
 # Get the gravity from the project settings to be synced with RigidBody nodes
 var gravity : float = ProjectSettings.get_setting("physics/3d/default_gravity") # Don't set this as a const, see the gravity section in _physics_process
 
+# Stores mouse input for rotating the camera in the phyhsics process
+var mouseInput : Vector2 = Vector2(0,0)
 
 func _ready():
 	#It is safe to comment this line if your game doesn't start with the mouse captured
@@ -157,6 +159,8 @@ func _physics_process(delta):
 	if !immobile: # Immobility works by interrupting user input, so other forces can still be applied to the player
 		input_dir = Input.get_vector(LEFT, RIGHT, FORWARD, BACKWARD)
 	handle_movement(delta, input_dir)
+
+	handle_rotation()
 	
 	# The player is not able to stand up if the ceiling is too low
 	low_ceiling = $CrouchCeilingDetection.is_colliding()
@@ -213,6 +217,13 @@ func handle_movement(delta, input_dir):
 		else:
 			velocity.x = direction.x * speed
 			velocity.z = direction.z * speed
+
+func handle_rotation():
+	HEAD.rotation_degrees.y -= mouseInput.x * mouse_sensitivity
+	HEAD.rotation_degrees.x -= mouseInput.y * mouse_sensitivity
+	mouseInput = Vector2(0,0)
+	
+	HEAD.rotation.x = clamp(HEAD.rotation.x, deg_to_rad(-90), deg_to_rad(90))
 
 
 func handle_state(moving):
@@ -334,9 +345,6 @@ func _process(delta):
 				Input.MOUSE_MODE_VISIBLE:
 					Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	
-	
-	HEAD.rotation.x = clamp(HEAD.rotation.x, deg_to_rad(-90), deg_to_rad(90))
-	
 	# Uncomment if you want full controller support
 	#var controller_view_rotation = Input.get_vector(LOOK_LEFT, LOOK_RIGHT, LOOK_UP, LOOK_DOWN)
 	#HEAD.rotation_degrees.y -= controller_view_rotation.x * 1.5
@@ -345,5 +353,5 @@ func _process(delta):
 
 func _unhandled_input(event):
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-		HEAD.rotation_degrees.y -= event.relative.x * mouse_sensitivity
-		HEAD.rotation_degrees.x -= event.relative.y * mouse_sensitivity
+		mouseInput.x += event.relative.x
+		mouseInput.y += event.relative.y
