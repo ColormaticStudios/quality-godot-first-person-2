@@ -160,7 +160,7 @@ func _physics_process(delta):
 		input_dir = Input.get_vector(LEFT, RIGHT, FORWARD, BACKWARD)
 	handle_movement(delta, input_dir)
 
-	handle_rotation()
+	handle_head_rotation()
 	
 	# The player is not able to stand up if the ceiling is too low
 	low_ceiling = $CrouchCeilingDetection.is_colliding()
@@ -218,7 +218,7 @@ func handle_movement(delta, input_dir):
 			velocity.x = direction.x * speed
 			velocity.z = direction.z * speed
 
-func handle_rotation():
+func handle_head_rotation():
 	HEAD.rotation_degrees.y -= mouseInput.x * mouse_sensitivity
 	HEAD.rotation_degrees.x -= mouseInput.y * mouse_sensitivity
 	mouseInput = Vector2(0,0)
