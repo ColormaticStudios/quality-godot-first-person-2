@@ -49,6 +49,7 @@ extends CharacterBody3D
 @export var SPRINT : String = "sprint"
 
 # Uncomment if you want full controller support
+#@export var controller_sensitivity : float = 0.035
 #@export var LOOK_LEFT : String = "look_left"
 #@export var LOOK_RIGHT : String = "look_right"
 #@export var LOOK_UP : String = "look_up"
@@ -241,7 +242,7 @@ func handle_head_rotation():
 	HEAD.rotation_degrees.x -= mouseInput.y * mouse_sensitivity
 	
 	# Uncomment for controller support
-	#var controller_view_rotation = Input.get_vector(LOOK_DOWN, LOOK_UP, LOOK_RIGHT, LOOK_LEFT) * 0.035 # These are inverted because of the nature of 3D rotation.
+	#var controller_view_rotation = Input.get_vector(LOOK_DOWN, LOOK_UP, LOOK_RIGHT, LOOK_LEFT) * controller_sensitivity # These are inverted because of the nature of 3D rotation.
 	#HEAD.rotation.x += controller_view_rotation.x
 	#HEAD.rotation.y += controller_view_rotation.y
 	
