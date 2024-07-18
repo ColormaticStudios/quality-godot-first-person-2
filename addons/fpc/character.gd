@@ -6,21 +6,29 @@
 
 extends CharacterBody3D
 
-# TODO: Add descriptions for each value
 
-
+## The settings for the character's movement and feel.
 @export_category("Character")
+## The speed that the character moves at without crouching or sprinting.
 @export var base_speed : float = 3.0
+## The speed that the character moves at when sprinting.
 @export var sprint_speed : float = 6.0
+## The speed that the character moves at when crouching.
 @export var crouch_speed : float = 1.0
 
+## How fast the character speeds up and slows down when Motion Smoothing is on.
 @export var acceleration : float = 10.0
+## How high the player jumps.
 @export var jump_velocity : float = 4.5
+## How far the player turns when the mouse is moved.
 @export var mouse_sensitivity : float = 0.1
+## Wether the player can use movement inputs. Does not stop outside forces or jumping. See Jumping Enabled.
 @export var immobile : bool = false
+## The reticle file to import at runtime. By default are in res://addons/fpc/reticles/. Set to an empty string to remove.
 @export_file var default_reticle
 
 @export_group("Nodes")
+## The node that holds the camera. This is rotated instead of the camera for mouse input.
 @export var HEAD : Node3D
 @export var CAMERA : Camera3D
 @export var HEADBOB_ANIMATION : AnimationPlayer
@@ -35,6 +43,7 @@ extends CharacterBody3D
 @export var RIGHT : String = "ui_right"
 @export var FORWARD : String = "ui_up"
 @export var BACKWARD : String = "ui_down"
+## By default this does not pause the game, but that can be set in _process.
 @export var PAUSE : String = "ui_cancel"
 @export var CROUCH : String = "crouch"
 @export var SPRINT : String = "sprint"
@@ -46,18 +55,27 @@ extends CharacterBody3D
 #@export var LOOK_DOWN : String = "look_down"
 
 @export_group("Feature Settings")
+## Enable or disable jumping. Useful for restrictive storytelling environments.
 @export var jumping_enabled : bool = true
+## Wether the player can move in the air or not.
 @export var in_air_momentum : bool = true
+## Smooths the feel of walking.
 @export var motion_smoothing : bool = true
 @export var sprint_enabled : bool = true
 @export var crouch_enabled : bool = true
 @export_enum("Hold to Crouch", "Toggle Crouch") var crouch_mode : int = 0
 @export_enum("Hold to Sprint", "Toggle Sprint") var sprint_mode : int = 0
+## Wether sprinting should effect FOV.
 @export var dynamic_fov : bool = true
+## If the player holds down the jump button, should the player keep hopping.
 @export var continuous_jumping : bool = true
+## Enables the view bobbing animation.
 @export var view_bobbing : bool = true
+## Enables an immersive animation when the player jumps and hits the ground.
 @export var jump_animation : bool = true
+## This determines wether the player can use the pause button, not wether the game will actually pause.
 @export var pausing_enabled : bool = true
+## Use with caution.
 @export var gravity_enabled : bool = true
 
 
@@ -344,11 +362,14 @@ func _process(delta):
 	
 	if pausing_enabled:
 		if Input.is_action_just_pressed(PAUSE):
+			# You may want another node to handle pausing, because this player may get paused too.
 			match Input.mouse_mode:
 				Input.MOUSE_MODE_CAPTURED:
 					Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+					#get_tree().paused = false
 				Input.MOUSE_MODE_VISIBLE:
 					Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+					#get_tree().paused = false
 
 
 func _unhandled_input(event):
