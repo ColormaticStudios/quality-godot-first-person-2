@@ -22,6 +22,8 @@ extends CharacterBody3D
 @export var jump_velocity : float = 4.5
 ## How far the player turns when the mouse is moved.
 @export var mouse_sensitivity : float = 0.1
+## Mouse/joystick invert y
+@export var invert_pitch_control := false
 ## Wether the player can use movement inputs. Does not stop outside forces or jumping. See Jumping Enabled.
 @export var immobile : bool = false
 ## The reticle file to import at runtime. By default are in res://addons/fpc/reticles/. Set to an empty string to remove.
@@ -239,12 +241,12 @@ func handle_movement(delta, input_dir):
 
 func handle_head_rotation():
 	HEAD.rotation_degrees.y -= mouseInput.x * mouse_sensitivity
-	HEAD.rotation_degrees.x -= mouseInput.y * mouse_sensitivity
+	HEAD.rotation_degrees.x -= mouseInput.y * mouse_sensitivity * (-1.0 if invert_pitch_control else 1.0)
 	
 	# Uncomment for controller support
 	#var controller_view_rotation = Input.get_vector(LOOK_DOWN, LOOK_UP, LOOK_RIGHT, LOOK_LEFT) * controller_sensitivity # These are inverted because of the nature of 3D rotation.
 	#HEAD.rotation.x += controller_view_rotation.x
-	#HEAD.rotation.y += controller_view_rotation.y
+	#HEAD.rotation.y += controller_view_rotation.y * (-1.0 if invert_pitch_control else 1.0)
 	
 	mouseInput = Vector2(0,0)
 	HEAD.rotation.x = clamp(HEAD.rotation.x, deg_to_rad(-90), deg_to_rad(90))
