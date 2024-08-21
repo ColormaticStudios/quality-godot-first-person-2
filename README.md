@@ -36,7 +36,7 @@ You can make this a super basic controller by just disabling everything.
 - In the `handle_head_rotation` function, there is another block of commented code that says the same thing. Uncomment that too.
 - You should now be able to look around with the joystick. Make sure you add the other controls to the input map. (movement, jumping, crouching, sprinting, etc.)
 
-**Slope/staircase**   
+**Slope/staircase:**   
 Credit to @roberto-urbani23  
 In the character inspector, you can uncheck Stop on Slope and set the max angle to 89 (for some reason, 90 will make the player stuck). Also Snap Length to 1 otherwise your character will not remain attached to stairs if you sprint while going downstairs.
 
