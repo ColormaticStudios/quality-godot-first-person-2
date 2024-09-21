@@ -117,6 +117,7 @@ func _ready():
 	CROUCH_ANIMATION.play("RESET")
 	
 	check_controls()
+	enter_normal_state()
 
 func check_controls(): # If you add a control, you might want to add a check for it here.
 	# The actions are being disabled so the engine doesn't halt the entire project in debug mode
