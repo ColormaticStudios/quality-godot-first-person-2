@@ -38,24 +38,31 @@ extends CharacterBody3D
 @export var CROUCH_ANIMATION : AnimationPlayer
 @export var COLLISION_MESH : CollisionShape3D
 
-@export_group("Controls")
 # We are using UI controls because they are built into Godot Engine so they can be used right away
-@export var JUMP : String = "ui_accept"
-@export var LEFT : String = "ui_left"
-@export var RIGHT : String = "ui_right"
-@export var FORWARD : String = "ui_up"
-@export var BACKWARD : String = "ui_down"
-## By default this does not pause the game, but that can be changed in _process.
-@export var PAUSE : String = "ui_cancel"
-@export var CROUCH : String = "crouch"
-@export var SPRINT : String = "sprint"
-
-# Uncomment if you want controller support
-#@export var controller_sensitivity : float = 0.035
-#@export var LOOK_LEFT : String = "look_left"
-#@export var LOOK_RIGHT : String = "look_right"
-#@export var LOOK_UP : String = "look_up"
-#@export var LOOK_DOWN : String = "look_down"
+@export_group("Controls")
+## Use the Input Map to map a mouse/keyboard input to an action add a reference to it to this dictionay to be used in the script.
+@export var controls : Dictionary = { 
+	LEFT = "ui_left", 
+	RIGHT = "ui_right",
+	FORWARD = "ui_up",
+	BACKWARD = "ui_down",
+	JUMP = "ui_accept",
+	CROUCH = "crouch",
+	SPRINT = "sprint",
+	PAUSE = "ui_cancel"
+	}
+@export_subgroup("Controller Specific")
+## This only effects how the camera is handled, the rest should be covered by adding controller inputs to the existing actions in the Input Map.
+@export var controller_support : bool = false
+## Use the Input Map to map a controller input to an action add a reference to it to this dictionay to be used in the script.
+@export var controller_controls : Dictionary = { 
+	LOOK_LEFT = "look_left",
+	LOOK_RIGHT = "look_right",
+	LOOK_UP = "look_up",
+	LOOK_DOWN = "look_down"
+	}
+## The sensitvity of the analog stick that controls camera rotation. Lower is less sensitive and higher is more sensitive.
+@export_range(0.001, 1, 0.001) var look_sensitivity : float = 0.035
 
 @export_group("Feature Settings")
 ## Enable or disable jumping. Useful for restrictive storytelling environments.
@@ -123,28 +130,28 @@ func _ready():
 
 func check_controls(): # If you add a control, you might want to add a check for it here.
 	# The actions are being disabled so the engine doesn't halt the entire project in debug mode
-	if !InputMap.has_action(JUMP):
+	if !InputMap.has_action(controls.JUMP):
 		push_error("No control mapped for jumping. Please add an input map control. Disabling jump.")
 		jumping_enabled = false
-	if !InputMap.has_action(LEFT):
+	if !InputMap.has_action(controls.LEFT):
 		push_error("No control mapped for move left. Please add an input map control. Disabling movement.")
 		immobile = true
-	if !InputMap.has_action(RIGHT):
+	if !InputMap.has_action(controls.RIGHT):
 		push_error("No control mapped for move right. Please add an input map control. Disabling movement.")
 		immobile = true
-	if !InputMap.has_action(FORWARD):
+	if !InputMap.has_action(controls.FORWARD):
 		push_error("No control mapped for move forward. Please add an input map control. Disabling movement.")
 		immobile = true
-	if !InputMap.has_action(BACKWARD):
+	if !InputMap.has_action(controls.BACKWARD):
 		push_error("No control mapped for move backward. Please add an input map control. Disabling movement.")
 		immobile = true
-	if !InputMap.has_action(PAUSE):
+	if !InputMap.has_action(controls.PAUSE):
 		push_error("No control mapped for pause. Please add an input map control. Disabling pausing.")
 		pausing_enabled = false
-	if !InputMap.has_action(CROUCH):
+	if !InputMap.has_action(controls.CROUCH):
 		push_error("No control mapped for crouch. Please add an input map control. Disabling crouching.")
 		crouch_enabled = false
-	if !InputMap.has_action(SPRINT):
+	if !InputMap.has_action(controls.SPRINT):
 		push_error("No control mapped for sprint. Please add an input map control. Disabling sprinting.")
 		sprint_enabled = false
 
@@ -182,7 +189,7 @@ func _physics_process(delta):
 	
 	var input_dir = Vector2.ZERO
 	if !immobile: # Immobility works by interrupting user input, so other forces can still be applied to the player
-		input_dir = Input.get_vector(LEFT, RIGHT, FORWARD, BACKWARD)
+		input_dir = Input.get_vector(controls.LEFT, controls.RIGHT, controls.FORWARD, controls.BACKWARD)
 	handle_movement(delta, input_dir)
 
 	handle_head_rotation()
@@ -211,12 +218,12 @@ func _physics_process(delta):
 func handle_jumping():
 	if jumping_enabled:
 		if continuous_jumping: # Hold down the jump button
-			if Input.is_action_pressed(JUMP) and is_on_floor() and !low_ceiling:
+			if Input.is_action_pressed(controls.JUMP) and is_on_floor() and !low_ceiling:
 				if jump_animation:
 					JUMP_ANIMATION.play("jump", 0.25)
 				velocity.y += jump_velocity # Adding instead of setting so jumping on slopes works properly
 		else:
-			if Input.is_action_just_pressed(JUMP) and is_on_floor() and !low_ceiling:
+			if Input.is_action_just_pressed(controls.JUMP) and is_on_floor() and !low_ceiling:
 				if jump_animation:
 					JUMP_ANIMATION.play("jump", 0.25)
 				velocity.y += jump_velocity
@@ -250,13 +257,13 @@ func handle_head_rotation():
 	else:
 		HEAD.rotation_degrees.x -= mouseInput.y * mouse_sensitivity
 	
-	# Uncomment for controller support
-	#var controller_view_rotation = Input.get_vector(LOOK_DOWN, LOOK_UP, LOOK_RIGHT, LOOK_LEFT) * controller_sensitivity # These are inverted because of the nature of 3D rotation.
-	#HEAD.rotation.x += controller_view_rotation.x
-	#if invert_mouse_y:
-		#HEAD.rotation.y += controller_view_rotation.y * -1.0
-	#else:
-		#HEAD.rotation.y += controller_view_rotation.y
+	if controller_support:
+		var controller_view_rotation = Input.get_vector(controller_controls.LOOK_DOWN, controller_controls.LOOK_UP, controller_controls.LOOK_RIGHT, controller_controls.LOOK_LEFT) * look_sensitivity # These are inverted because of the nature of 3D rotation.
+		HEAD.rotation.x += controller_view_rotation.x
+		if invert_mouse_y:
+			HEAD.rotation.y += controller_view_rotation.y * -1.0
+		else:
+			HEAD.rotation.y += controller_view_rotation.y
 	
 	
 	mouseInput = Vector2(0,0)
@@ -266,7 +273,7 @@ func handle_head_rotation():
 func handle_state(moving):
 	if sprint_enabled:
 		if sprint_mode == 0:
-			if Input.is_action_pressed(SPRINT) and state != "crouching":
+			if Input.is_action_pressed(controls.SPRINT) and state != "crouching":
 				if moving:
 					if state != "sprinting":
 						enter_sprint_state()
@@ -278,9 +285,9 @@ func handle_state(moving):
 		elif sprint_mode == 1:
 			if moving:
 				# If the player is holding sprint before moving, handle that cenerio
-				if Input.is_action_pressed(SPRINT) and state == "normal":
+				if Input.is_action_pressed(controls.SPRINT) and state == "normal":
 					enter_sprint_state()
-				if Input.is_action_just_pressed(SPRINT):
+				if Input.is_action_just_pressed(controls.SPRINT):
 					match state:
 						"normal":
 							enter_sprint_state()
@@ -291,13 +298,13 @@ func handle_state(moving):
 	
 	if crouch_enabled:
 		if crouch_mode == 0:
-			if Input.is_action_pressed(CROUCH) and state != "sprinting":
+			if Input.is_action_pressed(controls.CROUCH) and state != "sprinting":
 				if state != "crouching":
 					enter_crouch_state()
 			elif state == "crouching" and !$CrouchCeilingDetection.is_colliding():
 				enter_normal_state()
 		elif crouch_mode == 1:
-			if Input.is_action_just_pressed(CROUCH):
+			if Input.is_action_just_pressed(controls.CROUCH):
 				match state:
 					"normal":
 						enter_crouch_state()
@@ -375,7 +382,7 @@ func _process(delta):
 	$UserInterface/DebugPanel.add_property("State", status, 4)
 	
 	if pausing_enabled:
-		if Input.is_action_just_pressed(PAUSE):
+		if Input.is_action_just_pressed(controls.PAUSE):
 			# You may want another node to handle pausing, because this player may get paused too.
 			match Input.mouse_mode:
 				Input.MOUSE_MODE_CAPTURED:
