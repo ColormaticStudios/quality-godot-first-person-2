@@ -80,6 +80,8 @@ extends CharacterBody3D
 @export var pausing_enabled : bool = true
 ## Use with caution.
 @export var gravity_enabled : bool = true
+## If your game changes the gravity value during gameplay, check this property to allow the player to experience the change in gravity.
+@export var dynamic_gravity : bool = false
 
 
 # Member variables
@@ -171,7 +173,8 @@ func _physics_process(delta):
 	$UserInterface/DebugPanel.add_property("Velocity", readable_velocity, 3)
 	
 	# Gravity
-	#gravity = ProjectSettings.get_setting("physics/3d/default_gravity") # If the gravity changes during your game, uncomment this code
+	if dynamic_gravity:
+		gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 	if not is_on_floor() and gravity and gravity_enabled:
 		velocity.y -= gravity * delta
 	
