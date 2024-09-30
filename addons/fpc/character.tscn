@@ -423,3 +423,6 @@ target_position = Vector3(0, 0.5, 0)
 
 [node name="EditorModule" type="Node" parent="."]
 script = ExtResource("3_v3ckk")
+
+[node name="JumpCooldownTimer" type="Timer" parent="."]
+one_shot = true

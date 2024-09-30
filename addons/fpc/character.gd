@@ -20,6 +20,8 @@ extends CharacterBody3D
 @export var acceleration : float = 10.0
 ## How high the player jumps.
 @export var jump_velocity : float = 4.5
+## How long the player has to be on the ground before being alowed to jump again. If continuous jumping is enabled, this timer is ignored and the player can jump as soon as they touch the ground.
+@export var jump_cooldown : float = 0
 ## How far the player turns when the mouse is moved.
 @export var mouse_sensitivity : float = 0.1
 ## Invert the Y input for mouse and joystick
@@ -194,14 +196,14 @@ func _physics_process(delta):
 	if view_bobbing:
 		headbob_animation(input_dir)
 	
-	if jump_animation:
-		if !was_on_floor and is_on_floor(): # The player just landed
+	if !was_on_floor and is_on_floor(): # The player just landed
+		if jump_animation:
 			match randi() % 2: #TODO: Change this to detecting velocity direction
 				0:
 					JUMP_ANIMATION.play("land_left", 0.25)
 				1:
 					JUMP_ANIMATION.play("land_right", 0.25)
-	
+		$JumpCooldownTimer.start(jump_cooldown)
 	was_on_floor = is_on_floor() # This must always be at the end of physics_process
 
 
@@ -212,7 +214,7 @@ func handle_jumping():
 				if jump_animation:
 					JUMP_ANIMATION.play("jump", 0.25)
 				velocity.y += jump_velocity # Adding instead of setting so jumping on slopes works properly
-		else:
+		elif $JumpCooldownTimer.is_stopped():
 			if Input.is_action_just_pressed(JUMP) and is_on_floor() and !low_ceiling:
 				if jump_animation:
 					JUMP_ANIMATION.play("jump", 0.25)
