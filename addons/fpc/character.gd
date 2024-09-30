@@ -22,20 +22,27 @@ extends CharacterBody3D
 @export var jump_velocity : float = 4.5
 ## How far the player turns when the mouse is moved.
 @export var mouse_sensitivity : float = 0.1
-## Invert the Y input for mouse and joystick
-@export var invert_mouse_y : bool = false # Possibly add an invert mouse X in the future
+## Invert the X axis input for camera.
+@export var invert_camera_x_axis : bool = false
+## Invert the Y axis input for camera.
+@export var invert_camera_y_axis : bool = false
 ## Wether the player can use movement inputs. Does not stop outside forces or jumping. See Jumping Enabled.
 @export var immobile : bool = false
 ## The reticle file to import at runtime. By default are in res://addons/fpc/reticles/. Set to an empty string to remove.
 @export_file var default_reticle
 
 @export_group("Nodes")
-## The node that holds the camera. This is rotated instead of the camera for mouse input.
+## A reference to the camera for use in the character script. This is the parent node to the camera and is rotated instead of the camera for mouse input.
 @export var HEAD : Node3D
+## A reference to the camera for use in the character script.
 @export var CAMERA : Camera3D
+## A reference to the headbob animation for use in the character script.
 @export var HEADBOB_ANIMATION : AnimationPlayer
+## A reference to the jump animation for use in the character script.
 @export var JUMP_ANIMATION : AnimationPlayer
+## A reference to the crouch animation for use in the character script.
 @export var CROUCH_ANIMATION : AnimationPlayer
+## A reference to the the player's collision shape for use in the character script.
 @export var COLLISION_MESH : CollisionShape3D
 
 # We are using UI controls because they are built into Godot Engine so they can be used right away
@@ -71,10 +78,14 @@ extends CharacterBody3D
 @export var in_air_momentum : bool = true
 ## Smooths the feel of walking.
 @export var motion_smoothing : bool = true
+## Enables or disables sprinting.
 @export var sprint_enabled : bool = true
-@export var crouch_enabled : bool = true
-@export_enum("Hold to Crouch", "Toggle Crouch") var crouch_mode : int = 0
+## Toggles the sprinting state when button is pressed or requires the player to hold the button down to remain sprinting.
 @export_enum("Hold to Sprint", "Toggle Sprint") var sprint_mode : int = 0
+## Enables or disables crouching.
+@export var crouch_enabled : bool = true
+## Toggles the crouch state when button is pressed or requires the player to hold the button down to remain crouched.
+@export_enum("Hold to Crouch", "Toggle Crouch") var crouch_mode : int = 0
 ## Wether sprinting should effect FOV.
 @export var dynamic_fov : bool = true
 ## If the player holds down the jump button, should the player keep hopping.
@@ -251,17 +262,25 @@ func handle_movement(delta, input_dir):
 			velocity.z = direction.z * speed
 
 func handle_head_rotation():
-	HEAD.rotation_degrees.y -= mouseInput.x * mouse_sensitivity
-	if invert_mouse_y:
-		HEAD.rotation_degrees.x -= mouseInput.y * mouse_sensitivity * -1.0
+	if invert_camera_x_axis:
+		HEAD.rotation_degrees.y -= mouseInput.x * mouse_sensitivity * -1
+	else:
+		HEAD.rotation_degrees.y -= mouseInput.x * mouse_sensitivity
+	
+	if invert_camera_y_axis:
+		HEAD.rotation_degrees.x -= mouseInput.y * mouse_sensitivity * -1
 	else:
 		HEAD.rotation_degrees.x -= mouseInput.y * mouse_sensitivity
 	
 	if controller_support:
 		var controller_view_rotation = Input.get_vector(controller_controls.LOOK_DOWN, controller_controls.LOOK_UP, controller_controls.LOOK_RIGHT, controller_controls.LOOK_LEFT) * look_sensitivity # These are inverted because of the nature of 3D rotation.
-		HEAD.rotation.x += controller_view_rotation.x
-		if invert_mouse_y:
-			HEAD.rotation.y += controller_view_rotation.y * -1.0
+		if invert_camera_x_axis:
+			HEAD.rotation.x += controller_view_rotation.x * -1
+		else:
+			HEAD.rotation.x += controller_view_rotation.x
+		
+		if invert_camera_y_axis:
+			HEAD.rotation.y += controller_view_rotation.y * -1
 		else:
 			HEAD.rotation.y += controller_view_rotation.y
 	
