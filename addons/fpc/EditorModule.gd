@@ -31,7 +31,7 @@ extends Node
 
 func _ready():
 	if !Engine.is_editor_hint():
-		print("not editor")
+		#print("not editor")
 		HEAD.rotation.y = deg_to_rad(head_y_rotation)
 		HEAD.rotation.x = deg_to_rad(head_x_rotation)
 
