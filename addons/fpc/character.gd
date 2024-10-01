@@ -1,6 +1,6 @@
 
 # COPYRIGHT Colormatic Studios
-# MIT licence
+# MIT license
 # Quality Godot First Person Controller v2
 
 
@@ -22,11 +22,11 @@ extends CharacterBody3D
 @export var jump_velocity : float = 4.5
 ## How far the player turns when the mouse is moved.
 @export var mouse_sensitivity : float = 0.1
-## Invert the X axis input for camera.
+## Invert the X axis input for the camera.
 @export var invert_camera_x_axis : bool = false
-## Invert the Y axis input for camera.
+## Invert the Y axis input for the camera.
 @export var invert_camera_y_axis : bool = false
-## Wether the player can use movement inputs. Does not stop outside forces or jumping. See Jumping Enabled.
+## Whether the player can use movement inputs. Does not stop outside forces or jumping. See Jumping Enabled.
 @export var immobile : bool = false
 ## The reticle file to import at runtime. By default are in res://addons/fpc/reticles/. Set to an empty string to remove.
 @export_file var default_reticle
@@ -47,7 +47,7 @@ extends CharacterBody3D
 
 # We are using UI controls because they are built into Godot Engine so they can be used right away
 @export_group("Controls")
-## Use the Input Map to map a mouse/keyboard input to an action add a reference to it to this dictionay to be used in the script.
+## Use the Input Map to map a mouse/keyboard input to an action and add a reference to it to this dictionary to be used in the script.
 @export var controls : Dictionary = { 
 	LEFT = "ui_left", 
 	RIGHT = "ui_right",
@@ -59,22 +59,22 @@ extends CharacterBody3D
 	PAUSE = "ui_cancel"
 	}
 @export_subgroup("Controller Specific")
-## This only effects how the camera is handled, the rest should be covered by adding controller inputs to the existing actions in the Input Map.
+## This only affects how the camera is handled, the rest should be covered by adding controller inputs to the existing actions in the Input Map.
 @export var controller_support : bool = false
-## Use the Input Map to map a controller input to an action add a reference to it to this dictionay to be used in the script.
+## Use the Input Map to map a controller input to an action and add a reference to it to this dictionary to be used in the script.
 @export var controller_controls : Dictionary = { 
 	LOOK_LEFT = "look_left",
 	LOOK_RIGHT = "look_right",
 	LOOK_UP = "look_up",
 	LOOK_DOWN = "look_down"
 	}
-## The sensitvity of the analog stick that controls camera rotation. Lower is less sensitive and higher is more sensitive.
+## The sensitivity of the analog stick that controls camera rotation. Lower is less sensitive and higher is more sensitive.
 @export_range(0.001, 1, 0.001) var look_sensitivity : float = 0.035
 
 @export_group("Feature Settings")
 ## Enable or disable jumping. Useful for restrictive storytelling environments.
 @export var jumping_enabled : bool = true
-## Wether the player can move in the air or not.
+## Whether the player can move in the air or not.
 @export var in_air_momentum : bool = true
 ## Smooths the feel of walking.
 @export var motion_smoothing : bool = true
@@ -107,7 +107,7 @@ var speed : float = base_speed
 var current_speed : float = 0.0
 # States: normal, crouching, sprinting
 var state : String = "normal"
-var low_ceiling : bool = false # This is for when the cieling is too low and the player needs to crouch.
+var low_ceiling : bool = false # This is for when the ceiling is too low and the player needs to crouch.
 var was_on_floor : bool = true # Was the player on the floor last frame (for landing animation)
 
 # The reticle should always have a Control node as the root
@@ -116,7 +116,7 @@ var RETICLE : Control
 # Get the gravity from the project settings to be synced with RigidBody nodes
 var gravity : float = ProjectSettings.get_setting("physics/3d/default_gravity") # Don't set this as a const, see the gravity section in _physics_process
 
-# Stores mouse input for rotating the camera in the phyhsics process
+# Stores mouse input for rotating the camera in the physics process
 var mouseInput : Vector2 = Vector2(0,0)
 
 func _ready():
@@ -219,7 +219,7 @@ func _physics_process(delta):
 		if !was_on_floor and is_on_floor(): # The player just landed
 			var velocity_2D : Vector2 = Vector2(velocity.x, velocity.y) # We have to flatten velocity to just x and y for the dot product math
 			
-			# Compares velocity direction against the x axis direction (via dot product) to determine which landing animatiion to play.
+			# Compares velocity direction against the x axis direction (via dot product) to determine which landing animation to play.
 			# We're using the built in Vector2.RIGHT as it always points along the x axis.
 			if velocity_2D.dot(Vector2.RIGHT) > 0:
 				JUMP_ANIMATION.play("land_right", 0.25)
@@ -308,7 +308,7 @@ func handle_state(moving):
 				enter_normal_state()
 		elif sprint_mode == 1:
 			if moving:
-				# If the player is holding sprint before moving, handle that scenerio
+				# If the player is holding sprint before moving, handle that scenario
 				if Input.is_action_pressed(controls.SPRINT) and state == "normal":
 					enter_sprint_state()
 				if Input.is_action_just_pressed(controls.SPRINT):
