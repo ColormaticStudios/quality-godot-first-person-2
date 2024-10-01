@@ -1,4 +1,3 @@
-
 # COPYRIGHT Colormatic Studios
 # MIT license
 # Quality Godot First Person Controller v2
@@ -6,6 +5,8 @@
 
 extends CharacterBody3D
 
+
+#region Character Export Group
 
 ## The settings for the character's movement and feel.
 @export_category("Character")
@@ -31,6 +32,10 @@ extends CharacterBody3D
 ## The reticle file to import at runtime. By default are in res://addons/fpc/reticles/. Set to an empty string to remove.
 @export_file var default_reticle
 
+#endregion
+
+#region Nodes Export Group
+
 @export_group("Nodes")
 ## A reference to the camera for use in the character script. This is the parent node to the camera and is rotated instead of the camera for mouse input.
 @export var HEAD : Node3D
@@ -45,6 +50,10 @@ extends CharacterBody3D
 ## A reference to the the player's collision shape for use in the character script.
 @export var COLLISION_MESH : CollisionShape3D
 
+#endregion
+
+#region Controls Export Group
+ 
 # We are using UI controls because they are built into Godot Engine so they can be used right away
 @export_group("Controls")
 ## Use the Input Map to map a mouse/keyboard input to an action and add a reference to it to this dictionary to be used in the script.
@@ -70,6 +79,10 @@ extends CharacterBody3D
 	}
 ## The sensitivity of the analog stick that controls camera rotation. Lower is less sensitive and higher is more sensitive.
 @export_range(0.001, 1, 0.001) var look_sensitivity : float = 0.035
+
+#endregion
+
+#region Feature Settings Export Group
 
 @export_group("Feature Settings")
 ## Enable or disable jumping. Useful for restrictive storytelling environments.
@@ -101,8 +114,11 @@ extends CharacterBody3D
 ## If your game changes the gravity value during gameplay, check this property to allow the player to experience the change in gravity.
 @export var dynamic_gravity : bool = false
 
+#endregion
 
-# Member variables
+#region Member Variable Initialization
+
+# These are variables used in this script that don't need to be exposed in the editor.
 var speed : float = base_speed
 var current_speed : float = 0.0
 # States: normal, crouching, sprinting
@@ -119,6 +135,12 @@ var gravity : float = ProjectSettings.get_setting("physics/3d/default_gravity") 
 # Stores mouse input for rotating the camera in the physics process
 var mouseInput : Vector2 = Vector2(0,0)
 
+#endregion
+
+
+
+#region Main Control Flow
+
 func _ready():
 	#It is safe to comment this line if your game doesn't start with the mouse captured
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
@@ -130,66 +152,19 @@ func _ready():
 	if default_reticle:
 		change_reticle(default_reticle)
 	
-	# Reset the camera position
-	# If you want to change the default head height, change these animations.
-	HEADBOB_ANIMATION.play("RESET")
-	JUMP_ANIMATION.play("RESET")
-	CROUCH_ANIMATION.play("RESET")
-	
+	initialize_animations()
 	check_controls()
 	enter_normal_state()
 
-func check_controls(): # If you add a control, you might want to add a check for it here.
-	# The actions are being disabled so the engine doesn't halt the entire project in debug mode
-	if !InputMap.has_action(controls.JUMP):
-		push_error("No control mapped for jumping. Please add an input map control. Disabling jump.")
-		jumping_enabled = false
-	if !InputMap.has_action(controls.LEFT):
-		push_error("No control mapped for move left. Please add an input map control. Disabling movement.")
-		immobile = true
-	if !InputMap.has_action(controls.RIGHT):
-		push_error("No control mapped for move right. Please add an input map control. Disabling movement.")
-		immobile = true
-	if !InputMap.has_action(controls.FORWARD):
-		push_error("No control mapped for move forward. Please add an input map control. Disabling movement.")
-		immobile = true
-	if !InputMap.has_action(controls.BACKWARD):
-		push_error("No control mapped for move backward. Please add an input map control. Disabling movement.")
-		immobile = true
-	if !InputMap.has_action(controls.PAUSE):
-		push_error("No control mapped for pause. Please add an input map control. Disabling pausing.")
-		pausing_enabled = false
-	if !InputMap.has_action(controls.CROUCH):
-		push_error("No control mapped for crouch. Please add an input map control. Disabling crouching.")
-		crouch_enabled = false
-	if !InputMap.has_action(controls.SPRINT):
-		push_error("No control mapped for sprint. Please add an input map control. Disabling sprinting.")
-		sprint_enabled = false
 
-
-func change_reticle(reticle): # Yup, this function is kinda strange
-	if RETICLE:
-		RETICLE.queue_free()
+func _process(delta):
+	if pausing_enabled:
+		handle_pausing()
 	
-	RETICLE = load(reticle).instantiate()
-	RETICLE.character = self
-	$UserInterface.add_child(RETICLE)
+	update_debug_menu_per_frame()
 
 
-func _physics_process(delta):
-	# Big thanks to github.com/LorenzoAncora for the concept of the improved debug values
-	current_speed = Vector3.ZERO.distance_to(get_real_velocity())
-	$UserInterface/DebugPanel.add_property("Speed", snappedf(current_speed, 0.001), 1)
-	$UserInterface/DebugPanel.add_property("Target speed", speed, 2)
-	var cv : Vector3 = get_real_velocity()
-	var vd : Array[float] = [
-		snappedf(cv.x, 0.001),
-		snappedf(cv.y, 0.001),
-		snappedf(cv.z, 0.001)
-	]
-	var readable_velocity : String = "X: " + str(vd[0]) + " Y: " + str(vd[1]) + " Z: " + str(vd[2])
-	$UserInterface/DebugPanel.add_property("Velocity", readable_velocity, 3)
-	
+func _physics_process(delta): # Most things happen here.
 	# Gravity
 	if dynamic_gravity:
 		gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
@@ -199,8 +174,10 @@ func _physics_process(delta):
 	handle_jumping()
 	
 	var input_dir = Vector2.ZERO
-	if !immobile: # Immobility works by interrupting user input, so other forces can still be applied to the player
+	
+	if not immobile: # Immobility works by interrupting user input, so other forces can still be applied to the player
 		input_dir = Input.get_vector(controls.LEFT, controls.RIGHT, controls.FORWARD, controls.BACKWARD)
+	
 	handle_movement(delta, input_dir)
 
 	handle_head_rotation()
@@ -213,23 +190,18 @@ func _physics_process(delta):
 		update_camera_fov()
 	
 	if view_bobbing:
-		headbob_animation(input_dir)
+		play_headbob_animation(input_dir)
 	
 	if jump_animation:
-		if !was_on_floor and is_on_floor(): # The player just landed
-			var velocity_2D : Vector2 = Vector2(velocity.x, velocity.y) # We have to flatten velocity to just x and y for the dot product math
-			
-			# Compares velocity direction against the x axis direction (via dot product) to determine which landing animation to play.
-			# We're using the built in Vector2.RIGHT as it always points along the x axis.
-			if velocity_2D.dot(Vector2.RIGHT) > 0:
-				JUMP_ANIMATION.play("land_right", 0.25)
-			elif velocity_2D.dot(Vector2.RIGHT) < 0:
-				JUMP_ANIMATION.play("land_left", 0.25)
-			else:
-				JUMP_ANIMATION.play("land_center", 0.25)
+		play_jump_animation()
+	
+	update_debug_menu_per_tick()
 	
 	was_on_floor = is_on_floor() # This must always be at the end of physics_process
 
+#endregion
+
+#region Input Handling
 
 func handle_jumping():
 	if jumping_enabled:
@@ -266,6 +238,7 @@ func handle_movement(delta, input_dir):
 			velocity.x = direction.x * speed
 			velocity.z = direction.z * speed
 
+
 func handle_head_rotation():
 	if invert_camera_x_axis:
 		HEAD.rotation_degrees.y -= mouseInput.x * mouse_sensitivity * -1
@@ -289,10 +262,40 @@ func handle_head_rotation():
 		else:
 			HEAD.rotation.y += controller_view_rotation.y
 	
-	
 	mouseInput = Vector2(0,0)
 	HEAD.rotation.x = clamp(HEAD.rotation.x, deg_to_rad(-90), deg_to_rad(90))
 
+
+func check_controls(): # If you add a control, you might want to add a check for it here.
+	# The actions are being disabled so the engine doesn't halt the entire project in debug mode
+	if !InputMap.has_action(controls.JUMP):
+		push_error("No control mapped for jumping. Please add an input map control. Disabling jump.")
+		jumping_enabled = false
+	if !InputMap.has_action(controls.LEFT):
+		push_error("No control mapped for move left. Please add an input map control. Disabling movement.")
+		immobile = true
+	if !InputMap.has_action(controls.RIGHT):
+		push_error("No control mapped for move right. Please add an input map control. Disabling movement.")
+		immobile = true
+	if !InputMap.has_action(controls.FORWARD):
+		push_error("No control mapped for move forward. Please add an input map control. Disabling movement.")
+		immobile = true
+	if !InputMap.has_action(controls.BACKWARD):
+		push_error("No control mapped for move backward. Please add an input map control. Disabling movement.")
+		immobile = true
+	if !InputMap.has_action(controls.PAUSE):
+		push_error("No control mapped for pause. Please add an input map control. Disabling pausing.")
+		pausing_enabled = false
+	if !InputMap.has_action(controls.CROUCH):
+		push_error("No control mapped for crouch. Please add an input map control. Disabling crouching.")
+		crouch_enabled = false
+	if !InputMap.has_action(controls.SPRINT):
+		push_error("No control mapped for sprint. Please add an input map control. Disabling sprinting.")
+		sprint_enabled = false
+
+#endregion
+
+#region State Handling
 
 func handle_state(moving):
 	if sprint_enabled:
@@ -338,7 +341,6 @@ func handle_state(moving):
 
 
 # Any enter state function should only be called once when you want to enter that state, not every frame.
-
 func enter_normal_state():
 	#print("entering normal state")
 	var prev_state = state
@@ -362,15 +364,18 @@ func enter_sprint_state():
 	state = "sprinting"
 	speed = sprint_speed
 
+#endregion
 
-func update_camera_fov():
-	if state == "sprinting":
-		CAMERA.fov = lerp(CAMERA.fov, 85.0, 0.3)
-	else:
-		CAMERA.fov = lerp(CAMERA.fov, 75.0, 0.3)
+#region Animation Handling
 
+func initialize_animations():
+	# Reset the camera position
+	# If you want to change the default head height, change these animations.
+	HEADBOB_ANIMATION.play("RESET")
+	JUMP_ANIMATION.play("RESET")
+	CROUCH_ANIMATION.play("RESET")
 
-func headbob_animation(moving):
+func play_headbob_animation(moving):
 	if moving and is_on_floor():
 		var use_headbob_animation : String
 		match state:
@@ -397,24 +402,44 @@ func headbob_animation(moving):
 			HEADBOB_ANIMATION.speed_scale = 1
 			HEADBOB_ANIMATION.play("RESET", 1)
 
+func play_jump_animation():
+	if !was_on_floor and is_on_floor(): # The player just landed
+		var velocity_2D : Vector2 = Vector2(velocity.x, velocity.y) # We have to flatten velocity to just x and y for the dot product math
+		
+		# Compares velocity direction against the x axis direction (via dot product) to determine which landing animation to play.
+		# We're using the built in Vector2.RIGHT as it always points along the x axis.
+		if velocity_2D.dot(Vector2.RIGHT) > 0:
+			JUMP_ANIMATION.play("land_right", 0.25)
+		elif velocity_2D.dot(Vector2.RIGHT) < 0:
+			JUMP_ANIMATION.play("land_left", 0.25)
+		else:
+			JUMP_ANIMATION.play("land_center", 0.25)
 
-func _process(delta):
+#endregion
+
+#region Debug Menu
+
+func update_debug_menu_per_frame():
 	$UserInterface/DebugPanel.add_property("FPS", Performance.get_monitor(Performance.TIME_FPS), 0)
 	var status : String = state
 	if !is_on_floor():
 		status += " in the air"
 	$UserInterface/DebugPanel.add_property("State", status, 4)
-	
-	if pausing_enabled:
-		if Input.is_action_just_pressed(controls.PAUSE):
-			# You may want another node to handle pausing, because this player may get paused too.
-			match Input.mouse_mode:
-				Input.MOUSE_MODE_CAPTURED:
-					Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-					#get_tree().paused = false
-				Input.MOUSE_MODE_VISIBLE:
-					Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-					#get_tree().paused = false
+
+
+func update_debug_menu_per_tick():
+	# Big thanks to github.com/LorenzoAncora for the concept of the improved debug values
+	current_speed = Vector3.ZERO.distance_to(get_real_velocity())
+	$UserInterface/DebugPanel.add_property("Speed", snappedf(current_speed, 0.001), 1)
+	$UserInterface/DebugPanel.add_property("Target speed", speed, 2)
+	var cv : Vector3 = get_real_velocity()
+	var vd : Array[float] = [
+		snappedf(cv.x, 0.001),
+		snappedf(cv.y, 0.001),
+		snappedf(cv.z, 0.001)
+	]
+	var readable_velocity : String = "X: " + str(vd[0]) + " Y: " + str(vd[1]) + " Z: " + str(vd[2])
+	$UserInterface/DebugPanel.add_property("Velocity", readable_velocity, 3)
 
 
 func _unhandled_input(event : InputEvent):
@@ -427,3 +452,35 @@ func _unhandled_input(event : InputEvent):
 			# Where we're going, we don't need InputMap
 			if event.keycode == 4194338: # F7
 				$UserInterface/DebugPanel.visible = !$UserInterface/DebugPanel.visible
+
+#endregion
+
+#region Misc Functions
+
+func change_reticle(reticle): # Yup, this function is kinda strange
+	if RETICLE:
+		RETICLE.queue_free()
+	
+	RETICLE = load(reticle).instantiate()
+	RETICLE.character = self
+	$UserInterface.add_child(RETICLE)
+
+
+func update_camera_fov():
+	if state == "sprinting":
+		CAMERA.fov = lerp(CAMERA.fov, 85.0, 0.3)
+	else:
+		CAMERA.fov = lerp(CAMERA.fov, 75.0, 0.3)
+
+func handle_pausing():
+	if Input.is_action_just_pressed(controls.PAUSE):
+		# You may want another node to handle pausing, because this player may get paused too.
+		match Input.mouse_mode:
+			Input.MOUSE_MODE_CAPTURED:
+				Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+				#get_tree().paused = false
+			Input.MOUSE_MODE_VISIBLE:
+				Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+				#get_tree().paused = false
+
+#endregion
