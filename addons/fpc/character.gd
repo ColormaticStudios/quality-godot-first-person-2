@@ -217,11 +217,16 @@ func _physics_process(delta):
 	
 	if jump_animation:
 		if !was_on_floor and is_on_floor(): # The player just landed
-			match randi() % 2: #TODO: Change this to detecting velocity direction
-				0:
-					JUMP_ANIMATION.play("land_left", 0.25)
-				1:
-					JUMP_ANIMATION.play("land_right", 0.25)
+			var velocity_2D : Vector2 = Vector2(velocity.x, velocity.y) # We have to flatten velocity to just x and y for the dot product math
+			
+			# Compares velocity direction against the x axis direction (via dot product) to determine which landing animatiion to play.
+			# We're using the built in Vector2.RIGHT as it always points along the x axis.
+			if velocity_2D.dot(Vector2.RIGHT) > 0:
+				JUMP_ANIMATION.play("land_right", 0.25)
+			elif velocity_2D.dot(Vector2.RIGHT) < 0:
+				JUMP_ANIMATION.play("land_left", 0.25)
+			else:
+				JUMP_ANIMATION.play("land_center", 0.25)
 	
 	was_on_floor = is_on_floor() # This must always be at the end of physics_process
 
@@ -303,7 +308,7 @@ func handle_state(moving):
 				enter_normal_state()
 		elif sprint_mode == 1:
 			if moving:
-				# If the player is holding sprint before moving, handle that cenerio
+				# If the player is holding sprint before moving, handle that scenerio
 				if Input.is_action_pressed(controls.SPRINT) and state == "normal":
 					enter_sprint_state()
 				if Input.is_action_just_pressed(controls.SPRINT):
