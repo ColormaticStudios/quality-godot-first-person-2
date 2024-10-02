@@ -404,13 +404,16 @@ func play_headbob_animation(moving):
 
 func play_jump_animation():
 	if !was_on_floor and is_on_floor(): # The player just landed
-		var velocity_2D : Vector2 = Vector2(velocity.x, velocity.y) # We have to flatten velocity to just x and y for the dot product math
+		var facing_direction : Vector3 = CAMERA.get_global_transform().basis.x
+		var facing_direction_2D : Vector2 = Vector2(facing_direction.x, facing_direction.z).normalized()
+		var velocity_2D : Vector2 = Vector2(velocity.x, velocity.z).normalized()
 		
-		# Compares velocity direction against the x axis direction (via dot product) to determine which landing animation to play.
-		# We're using the built in Vector2.RIGHT as it always points along the x axis.
-		if velocity_2D.dot(Vector2.RIGHT) > 0:
+		# Compares velocity direction against the camera direction (via dot product) to determine which landing animation to play.
+		var side_landed : int = round(velocity_2D.dot(facing_direction_2D))
+		
+		if side_landed > 0:
 			JUMP_ANIMATION.play("land_right", 0.25)
-		elif velocity_2D.dot(Vector2.RIGHT) < 0:
+		elif side_landed < 0:
 			JUMP_ANIMATION.play("land_left", 0.25)
 		else:
 			JUMP_ANIMATION.play("land_center", 0.25)
