@@ -53,12 +53,12 @@ extends CharacterBody3D
 #endregion
 
 #region Controls Export Group
- 
+
 # We are using UI controls because they are built into Godot Engine so they can be used right away
 @export_group("Controls")
 ## Use the Input Map to map a mouse/keyboard input to an action and add a reference to it to this dictionary to be used in the script.
-@export var controls : Dictionary = { 
-	LEFT = "ui_left", 
+@export var controls : Dictionary = {
+	LEFT = "ui_left",
 	RIGHT = "ui_right",
 	FORWARD = "ui_up",
 	BACKWARD = "ui_down",
@@ -71,7 +71,7 @@ extends CharacterBody3D
 ## This only affects how the camera is handled, the rest should be covered by adding controller inputs to the existing actions in the Input Map.
 @export var controller_support : bool = false
 ## Use the Input Map to map a controller input to an action and add a reference to it to this dictionary to be used in the script.
-@export var controller_controls : Dictionary = { 
+@export var controller_controls : Dictionary = {
 	LOOK_LEFT = "look_left",
 	LOOK_RIGHT = "look_right",
 	LOOK_UP = "look_up",
@@ -144,23 +144,23 @@ var mouseInput : Vector2 = Vector2(0,0)
 func _ready():
 	#It is safe to comment this line if your game doesn't start with the mouse captured
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	
+
 	# If the controller is rotated in a certain direction for game design purposes, redirect this rotation into the head.
 	HEAD.rotation.y = rotation.y
 	rotation.y = 0
-	
+
 	if default_reticle:
 		change_reticle(default_reticle)
-	
+
 	initialize_animations()
 	check_controls()
 	enter_normal_state()
 
 
-func _process(delta):
+func _process(_delta):
 	if pausing_enabled:
 		handle_pausing()
-	
+
 	update_debug_menu_per_frame()
 
 
@@ -170,33 +170,33 @@ func _physics_process(delta): # Most things happen here.
 		gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 	if not is_on_floor() and gravity and gravity_enabled:
 		velocity.y -= gravity * delta
-	
+
 	handle_jumping()
-	
+
 	var input_dir = Vector2.ZERO
-	
+
 	if not immobile: # Immobility works by interrupting user input, so other forces can still be applied to the player
 		input_dir = Input.get_vector(controls.LEFT, controls.RIGHT, controls.FORWARD, controls.BACKWARD)
-	
+
 	handle_movement(delta, input_dir)
 
 	handle_head_rotation()
-	
+
 	# The player is not able to stand up if the ceiling is too low
 	low_ceiling = $CrouchCeilingDetection.is_colliding()
-	
+
 	handle_state(input_dir)
 	if dynamic_fov: # This may be changed to an AnimationPlayer
 		update_camera_fov()
-	
+
 	if view_bobbing:
 		play_headbob_animation(input_dir)
-	
+
 	if jump_animation:
 		play_jump_animation()
-	
+
 	update_debug_menu_per_tick()
-	
+
 	was_on_floor = is_on_floor() # This must always be at the end of physics_process
 
 #endregion
@@ -221,7 +221,7 @@ func handle_movement(delta, input_dir):
 	var direction = input_dir.rotated(-HEAD.rotation.y)
 	direction = Vector3(direction.x, 0, direction.y)
 	move_and_slide()
-	
+
 	if in_air_momentum:
 		if is_on_floor():
 			if motion_smoothing:
@@ -244,24 +244,24 @@ func handle_head_rotation():
 		HEAD.rotation_degrees.y -= mouseInput.x * mouse_sensitivity * -1
 	else:
 		HEAD.rotation_degrees.y -= mouseInput.x * mouse_sensitivity
-	
+
 	if invert_camera_y_axis:
 		HEAD.rotation_degrees.x -= mouseInput.y * mouse_sensitivity * -1
 	else:
 		HEAD.rotation_degrees.x -= mouseInput.y * mouse_sensitivity
-	
+
 	if controller_support:
 		var controller_view_rotation = Input.get_vector(controller_controls.LOOK_DOWN, controller_controls.LOOK_UP, controller_controls.LOOK_RIGHT, controller_controls.LOOK_LEFT) * look_sensitivity # These are inverted because of the nature of 3D rotation.
 		if invert_camera_x_axis:
 			HEAD.rotation.x += controller_view_rotation.x * -1
 		else:
 			HEAD.rotation.x += controller_view_rotation.x
-		
+
 		if invert_camera_y_axis:
 			HEAD.rotation.y += controller_view_rotation.y * -1
 		else:
 			HEAD.rotation.y += controller_view_rotation.y
-	
+
 	mouseInput = Vector2(0,0)
 	HEAD.rotation.x = clamp(HEAD.rotation.x, deg_to_rad(-90), deg_to_rad(90))
 
@@ -322,7 +322,7 @@ func handle_state(moving):
 							enter_normal_state()
 			elif state == "sprinting":
 				enter_normal_state()
-	
+
 	if crouch_enabled:
 		if crouch_mode == 0:
 			if Input.is_action_pressed(controls.CROUCH) and state != "sprinting":
@@ -351,7 +351,6 @@ func enter_normal_state():
 
 func enter_crouch_state():
 	#print("entering crouch state")
-	var prev_state = state
 	state = "crouching"
 	speed = crouch_speed
 	CROUCH_ANIMATION.play("crouch")
@@ -383,11 +382,11 @@ func play_headbob_animation(moving):
 				use_headbob_animation = "walk"
 			"sprinting":
 				use_headbob_animation = "sprint"
-		
+
 		var was_playing : bool = false
 		if HEADBOB_ANIMATION.current_animation == use_headbob_animation:
 			was_playing = true
-		
+
 		HEADBOB_ANIMATION.play(use_headbob_animation, 0.25)
 		HEADBOB_ANIMATION.speed_scale = (current_speed / base_speed) * 1.75
 		if !was_playing:
@@ -396,7 +395,7 @@ func play_headbob_animation(moving):
 			# The headbob animation has two starting positions. One is at 0 and the other is at 1.
 			# randi() % 2 returns either 0 or 1, and so the animation randomly starts at one of the starting positions.
 			# This code is extremely performant but it makes no sense.
-		
+
 	else:
 		if HEADBOB_ANIMATION.current_animation == "sprint" or HEADBOB_ANIMATION.current_animation == "walk":
 			HEADBOB_ANIMATION.speed_scale = 1
@@ -407,10 +406,10 @@ func play_jump_animation():
 		var facing_direction : Vector3 = CAMERA.get_global_transform().basis.x
 		var facing_direction_2D : Vector2 = Vector2(facing_direction.x, facing_direction.z).normalized()
 		var velocity_2D : Vector2 = Vector2(velocity.x, velocity.z).normalized()
-		
+
 		# Compares velocity direction against the camera direction (via dot product) to determine which landing animation to play.
 		var side_landed : int = round(velocity_2D.dot(facing_direction_2D))
-		
+
 		if side_landed > 0:
 			JUMP_ANIMATION.play("land_right", 0.25)
 		elif side_landed < 0:
@@ -463,7 +462,7 @@ func _unhandled_input(event : InputEvent):
 func change_reticle(reticle): # Yup, this function is kinda strange
 	if RETICLE:
 		RETICLE.queue_free()
-	
+
 	RETICLE = load(reticle).instantiate()
 	RETICLE.character = self
 	$UserInterface.add_child(RETICLE)
