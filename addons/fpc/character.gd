@@ -211,8 +211,8 @@ func _physics_process(delta): # Most things happen here.
 	low_ceiling = $CrouchCeilingDetection.is_colliding()
 
 	handle_state(input_dir)
-	if dynamic_fov: # This may be changed to an AnimationPlayer
-		update_camera_fov(delta)
+	
+	update_camera_fov(delta)
 
 	if view_bobbing:
 		play_headbob_animation(input_dir)
@@ -538,7 +538,7 @@ func calculate_fov():
 func update_camera_fov(delta):
 	if state == "zooming":
 		CAMERA.fov = lerp(CAMERA.fov, zoom_fov, delta * zoom_speed)
-	elif state == "sprinting":
+	elif state == "sprinting" and dynamic_fov:
 		CAMERA.fov = lerp(CAMERA.fov, 85.0, 0.3)
 	else:
 		CAMERA.fov = lerp(CAMERA.fov, 75.0, 0.3)
