@@ -16,6 +16,8 @@ extends CharacterBody3D
 @export var sprint_speed : float = 6.0
 ## The speed that the character moves at when crouching.
 @export var crouch_speed : float = 1.0
+## The speed at which the camera zooms.
+@export var zoom_speed : float = 8.0
 
 ## How fast the character speeds up and slows down when Motion Smoothing is on.
 @export var acceleration : float = 10.0
@@ -23,6 +25,10 @@ extends CharacterBody3D
 @export var jump_velocity : float = 4.5
 ## How far the player turns when the mouse is moved.
 @export var mouse_sensitivity : float = 0.1
+## The level of camera zoom when character is zoomed in.
+@export var zoom_multiplier : float = 2.0
+## Automatically adjust mouse sensitivty when zoomed in to keep relative sensitivity equal.
+@export var zoom_sensitivity_compensation : bool = true
 ## Invert the X axis input for the camera.
 @export var invert_camera_x_axis : bool = false
 ## Invert the Y axis input for the camera.
@@ -65,7 +71,8 @@ extends CharacterBody3D
 	JUMP = "ui_accept",
 	CROUCH = "crouch",
 	SPRINT = "sprint",
-	PAUSE = "ui_cancel"
+	PAUSE = "ui_cancel",
+	ZOOM = "zoom"
 	}
 @export_subgroup("Controller Specific")
 ## This only affects how the camera is handled, the rest should be covered by adding controller inputs to the existing actions in the Input Map.
@@ -93,12 +100,16 @@ extends CharacterBody3D
 @export var motion_smoothing : bool = true
 ## Enables or disables sprinting.
 @export var sprint_enabled : bool = true
+## Enable camera zoom
+@export var zoom_enabled: bool = true
 ## Toggles the sprinting state when button is pressed or requires the player to hold the button down to remain sprinting.
 @export_enum("Hold to Sprint", "Toggle Sprint") var sprint_mode : int = 0
 ## Enables or disables crouching.
 @export var crouch_enabled : bool = true
 ## Toggles the crouch state when button is pressed or requires the player to hold the button down to remain crouched.
 @export_enum("Hold to Crouch", "Toggle Crouch") var crouch_mode : int = 0
+## Toggles the camera zoom when button is pressed or requires the player to hold the botton down to remain zoomed in.
+@export_enum("Hold to Zoom", "Toggle Zoom") var zoom_mode : int = 0
 ## Wether sprinting should effect FOV.
 @export var dynamic_fov : bool = true
 ## If the player holds down the jump button, should the player keep hopping.
@@ -126,6 +137,11 @@ var state : String = "normal"
 var low_ceiling : bool = false # This is for when the ceiling is too low and the player needs to crouch.
 var was_on_floor : bool = true # Was the player on the floor last frame (for landing animation)
 
+# Get the default fov of the camera so zoom multiplication is consistent across different fov values.
+var default_fov : float
+# The zoom_fov is calculated as (default_fov / zoom_multiplier)
+var zoom_fov : float
+
 # The reticle should always have a Control node as the root
 var RETICLE : Control
 
@@ -134,6 +150,9 @@ var gravity : float = ProjectSettings.get_setting("physics/3d/default_gravity") 
 
 # Stores mouse input for rotating the camera in the physics process
 var mouseInput : Vector2 = Vector2(0,0)
+
+var default_mouse_sensitivity : float
+var zoom_compensated_mouse_sensitivity : float
 
 #endregion
 
@@ -148,7 +167,10 @@ func _ready():
 	# If the controller is rotated in a certain direction for game design purposes, redirect this rotation into the head.
 	HEAD.rotation.y = rotation.y
 	rotation.y = 0
-
+	
+	if zoom_enabled:
+		calculate_fov()
+		
 	if default_reticle:
 		change_reticle(default_reticle)
 
@@ -181,13 +203,16 @@ func _physics_process(delta): # Most things happen here.
 	handle_movement(delta, input_dir)
 
 	handle_head_rotation()
+	
+	if zoom_enabled:
+		handle_zoom()
 
 	# The player is not able to stand up if the ceiling is too low
 	low_ceiling = $CrouchCeilingDetection.is_colliding()
 
 	handle_state(input_dir)
 	if dynamic_fov: # This may be changed to an AnimationPlayer
-		update_camera_fov()
+		update_camera_fov(delta)
 
 	if view_bobbing:
 		play_headbob_animation(input_dir)
@@ -265,6 +290,18 @@ func handle_head_rotation():
 	mouseInput = Vector2(0,0)
 	HEAD.rotation.x = clamp(HEAD.rotation.x, deg_to_rad(-90), deg_to_rad(90))
 
+func handle_zoom():
+	if zoom_enabled:
+		if zoom_mode == 0:
+			if Input.is_action_just_pressed(controls.ZOOM) and state != "zooming":
+				enter_zoom_state()
+			elif Input.is_action_just_released(controls.ZOOM) and state == "zooming":
+				enter_normal_state()
+		elif zoom_mode == 1:
+			if Input.is_action_just_pressed(controls.ZOOM) and state == "normal":
+				enter_zoom_state()
+			elif Input.is_action_just_pressed(controls.ZOOM) and state == "zooming":
+				enter_normal_state()
 
 func check_controls(): # If you add a control, you might want to add a check for it here.
 	# The actions are being disabled so the engine doesn't halt the entire project in debug mode
@@ -286,6 +323,9 @@ func check_controls(): # If you add a control, you might want to add a check for
 	if !InputMap.has_action(controls.PAUSE):
 		push_error("No control mapped for pause. Please add an input map control. Disabling pausing.")
 		pausing_enabled = false
+	if !InputMap.has_action(controls.ZOOM):
+		push_error("No control mapped for zoom. Please add an input map control. Disabling zooming.")
+		zoom_enabled = false
 	if !InputMap.has_action(controls.CROUCH):
 		push_error("No control mapped for crouch. Please add an input map control. Disabling crouching.")
 		crouch_enabled = false
@@ -348,6 +388,8 @@ func enter_normal_state():
 		CROUCH_ANIMATION.play_backwards("crouch")
 	state = "normal"
 	speed = base_speed
+	if zoom_sensitivity_compensation:
+		mouse_sensitivity = default_mouse_sensitivity
 
 func enter_crouch_state():
 	#print("entering crouch state")
@@ -362,6 +404,15 @@ func enter_sprint_state():
 		CROUCH_ANIMATION.play_backwards("crouch")
 	state = "sprinting"
 	speed = sprint_speed
+
+func enter_zoom_state():
+	#print("entering zoom state")
+	var prev_state = state
+	state = "zooming"
+	speed = crouch_speed
+	
+	if zoom_sensitivity_compensation:
+		mouse_sensitivity = zoom_compensated_mouse_sensitivity
 
 #endregion
 
@@ -466,10 +517,28 @@ func change_reticle(reticle): # Yup, this function is kinda strange
 	RETICLE = load(reticle).instantiate()
 	RETICLE.character = self
 	$UserInterface.add_child(RETICLE)
+	
+func calculate_fov():
+	# Retrieve the camera fov settings so the zoom amount scales correctly with different player fov.
+	# Dividing by zoom_multiplier instead of sqrt(zoom_multiplier) for more accurate size rather than accurate area.
+	default_fov = CAMERA.fov
+	zoom_fov = default_fov / sqrt(zoom_multiplier)
+	
+	# Determine the modified mouse sensitivity such that it feels the same when zoomed in.
+	if zoom_sensitivity_compensation:
+		default_mouse_sensitivity = mouse_sensitivity
+		var screen_size = get_viewport().size
+		
+		var fovy = 2 * atan(1.0/screen_size[1] * tan(zoom_fov/2 * PI/180.0)) * 180.0/PI
+		var fovx = 2 * atan(1.0/screen_size[0] * tan(default_fov/2.0 * PI/180.0)) * 180.0/PI
+		var zoom_sense_modifier = fovy/fovx
+		zoom_compensated_mouse_sensitivity = default_mouse_sensitivity * zoom_sense_modifier
 
 
-func update_camera_fov():
-	if state == "sprinting":
+func update_camera_fov(delta):
+	if state == "zooming":
+		CAMERA.fov = lerp(CAMERA.fov, zoom_fov, delta * zoom_speed)
+	elif state == "sprinting":
 		CAMERA.fov = lerp(CAMERA.fov, 85.0, 0.3)
 	else:
 		CAMERA.fov = lerp(CAMERA.fov, 75.0, 0.3)

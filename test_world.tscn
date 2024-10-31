@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://cs4drhmc1bql5"]
+[gd_scene load_steps=17 format=3 uid="uid://cs4drhmc1bql5"]
 
 [ext_resource type="PackedScene" uid="uid://cc1m2a1obsyn4" path="res://addons/fpc/character.tscn" id="1_e18vq"]
 [ext_resource type="Texture2D" uid="uid://pe7a4weirj2g" path="res://textures/dark.png" id="2_08fdt"]
@@ -60,10 +60,15 @@ roughness = 0.5
 uv1_triplanar = true
 uv1_triplanar_sharpness = 0.000850145
 
+[sub_resource type="BoxMesh" id="BoxMesh_44ymp"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_1h5ka"]
+
 [node name="test_world" type="Node3D"]
 
 [node name="Character" parent="." instance=ExtResource("1_e18vq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+zoom_multiplier = 8.0
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_20rw3")
@@ -104,3 +109,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 3, -15.5)
 use_collision = true
 size = Vector3(19, 8, 1)
 material = SubResource("StandardMaterial3D_7j4uu")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 50)
+mesh = SubResource("BoxMesh_44ymp")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 2, 1, 10)
+mesh = SubResource("BoxMesh_1h5ka")
+skeleton = NodePath("../MeshInstance3D")
