@@ -1,8 +1,8 @@
 [gd_scene load_steps=22 format=3 uid="uid://cc1m2a1obsyn4"]
 
-[ext_resource type="Script" path="res://addons/fpc/character.gd" id="1_0t4e8"]
-[ext_resource type="Script" path="res://addons/fpc/EditorModule.gd" id="3_v3ckk"]
-[ext_resource type="Script" path="res://addons/fpc/debug.gd" id="3_x1wcc"]
+[ext_resource type="Script" uid="uid://hutuis63hgev" path="res://addons/fpc/character.gd" id="1_0t4e8"]
+[ext_resource type="Script" uid="uid://dgfl3skp075ft" path="res://addons/fpc/EditorModule.gd" id="3_v3ckk"]
+[ext_resource type="Script" uid="uid://u5u7xxlvmcxx" path="res://addons/fpc/debug.gd" id="3_x1wcc"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kp17n"]
 albedo_color = Color(0.909804, 0.596078, 0, 1)
@@ -144,8 +144,8 @@ tracks/4/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_5e5t5"]
 _data = {
-"RESET": SubResource("Animation_j8cx7"),
-"crouch": SubResource("Animation_5ec5e")
+&"RESET": SubResource("Animation_j8cx7"),
+&"crouch": SubResource("Animation_5ec5e")
 }
 
 [sub_resource type="Animation" id="Animation_gh776"]
@@ -231,9 +231,9 @@ tracks/1/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_o0unb"]
 _data = {
-"RESET": SubResource("Animation_gh776"),
-"sprint": SubResource("Animation_8ku67"),
-"walk": SubResource("Animation_lrqmv")
+&"RESET": SubResource("Animation_gh776"),
+&"sprint": SubResource("Animation_8ku67"),
+&"walk": SubResource("Animation_lrqmv")
 }
 
 [sub_resource type="Animation" id="Animation_fvvjq"]
@@ -365,11 +365,11 @@ tracks/1/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_qeg5r"]
 _data = {
-"RESET": SubResource("Animation_fvvjq"),
-"jump": SubResource("Animation_s07ye"),
-"land_center": SubResource("Animation_3eyjl"),
-"land_left": SubResource("Animation_l1rph"),
-"land_right": SubResource("Animation_vsknp")
+&"RESET": SubResource("Animation_fvvjq"),
+&"jump": SubResource("Animation_s07ye"),
+&"land_center": SubResource("Animation_3eyjl"),
+&"land_left": SubResource("Animation_l1rph"),
+&"land_right": SubResource("Animation_vsknp")
 }
 
 [sub_resource type="Theme" id="Theme_wdf0f"]
