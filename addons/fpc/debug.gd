@@ -15,4 +15,7 @@ func add_property(title : String, value, order : int): # This can either be call
 		target.text = title + ": " + str(value)
 	elif visible:
 		target.text = title + ": " + str(value)
+		var size = $MarginContainer/VBoxContainer.get_child_count()
+		if order > size:
+			order = size
 		$MarginContainer/VBoxContainer.move_child(target, order)
