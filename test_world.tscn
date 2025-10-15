@@ -26,10 +26,10 @@ frequency = 0.0027
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_7akuf"]
 width = 1024
 height = 1024
-in_3d_space = true
-seamless = true
-color_ramp = SubResource("Gradient_ur0vy")
 noise = SubResource("FastNoiseLite_jd3pw")
+color_ramp = SubResource("Gradient_ur0vy")
+seamless = true
+in_3d_space = true
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_67ysu"]
 albedo_texture = SubResource("NoiseTexture2D_7akuf")
