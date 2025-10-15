@@ -155,6 +155,9 @@ func _ready():
 	initialize_animations()
 	check_controls()
 	enter_normal_state()
+	
+	if OS.get_name() == "Web":
+		Input.set_use_accumulated_input(false)
 
 
 func _process(_delta):
@@ -446,8 +449,7 @@ func update_debug_menu_per_tick():
 
 func _unhandled_input(event : InputEvent):
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-		mouseInput.x += event.relative.x
-		mouseInput.y += event.relative.y
+		mouseInput = event.relative
 	# Toggle debug menu
 	elif event is InputEventKey:
 		if event.is_released():
