@@ -2,10 +2,10 @@
 Actually good first person controller for the Godot Engine.  
 MIT License (credit Colormatic Studios)
 
-This first person controller was made because there aren't many first person controllers for Godot, and the ones that do exist are pretty bad.  
+This first person controller was made because there weren't many first person controllers for Godot at the time, and the ones that did exist were pretty bad.
 It is highly customizable and comes with many features, QOL, and clean code.
 
-Some parts came from StayAtHomeDev's FPS tutorial. You can find that [here](https://www.youtube.com/playlist?list=PLEHvj4yeNfeF6s-UVs5Zx5TfNYmeCiYwf).
+Originally inspired by StayAtHomeDev's FPS tutorial. You can find that [here](https://www.youtube.com/playlist?list=PLEHvj4yeNfeF6s-UVs5Zx5TfNYmeCiYwf).
 
 # Directions
 Move with WASD, space to jump, shift to sprint, C to crouch.
