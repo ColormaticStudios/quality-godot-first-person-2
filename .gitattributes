@@ -2,5 +2,5 @@
 * text=auto eol=lf
 
 # Only include the addons folder when downloading from the asset library.
+/addons/** -export-ignore
 /**         export-ignore
-/addons/** !export-ignore
