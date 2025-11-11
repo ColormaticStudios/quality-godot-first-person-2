@@ -255,12 +255,12 @@ func handle_head_rotation():
 
 	if controller_support:
 		var controller_view_rotation = Input.get_vector(controller_controls.LOOK_DOWN, controller_controls.LOOK_UP, controller_controls.LOOK_RIGHT, controller_controls.LOOK_LEFT) * look_sensitivity # These are inverted because of the nature of 3D rotation.
-		if invert_camera_x_axis:
+		if invert_camera_y_axis:
 			HEAD.rotation.x += controller_view_rotation.x * -1
 		else:
 			HEAD.rotation.x += controller_view_rotation.x
 
-		if invert_camera_y_axis:
+		if invert_camera_x_axis:
 			HEAD.rotation.y += controller_view_rotation.y * -1
 		else:
 			HEAD.rotation.y += controller_view_rotation.y
