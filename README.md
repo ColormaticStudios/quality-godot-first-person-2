@@ -22,7 +22,7 @@ Move with WASD, space to jump, shift to sprint, C to crouch.
 - Crouching
 - Sprinting
 - 2 crosshairs/reticles, one is animated (more to come?)
-- Controller/GamePad support (enabled through code, see wiki)
+- Controller/GamePad support
 - In-editor tools (enable editable children to use)
 
 If you make a cool game with this addon, I would love to hear about it!
@@ -58,14 +58,6 @@ You need to install Git or a Git GUI application.
 **To start out**, you should probably remap all of the movement keys to your own control set.
 
 You can make this a super basic controller by just disabling everything.
-
-**How to add controller/GamePad support**
-
-- In the controls export group, there is a commented section at the end that says "Uncomment this if you want full controller support". Uncomment that block.
-- Make a key map for each direction (left, right, up, down) and map them to your joystick.
-- Write in these keymaps in the controls section of the player settings.
-- In the `handle_head_rotation` function, there is another block of commented code that says the same thing. Uncomment that too.
-- You should now be able to look around with the joystick. Make sure you add the other controls to the input map. (movement, jumping, crouching, sprinting, etc.)
 
 **Slope/staircase:**
 
