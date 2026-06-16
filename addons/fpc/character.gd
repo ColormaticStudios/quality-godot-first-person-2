@@ -449,7 +449,7 @@ func update_debug_menu_per_tick():
 
 func _unhandled_input(event : InputEvent):
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-		mouseInput = event.relative
+		mouseInput = event.screen_relative
 	# Toggle debug menu
 	elif event is InputEventKey:
 		if event.is_released():

@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://cs4drhmc1bql5"]
+[gd_scene format=3 uid="uid://cs4drhmc1bql5"]
 
 [ext_resource type="PackedScene" uid="uid://cc1m2a1obsyn4" path="res://addons/fpc/character.tscn" id="1_e18vq"]
 [ext_resource type="Texture2D" uid="uid://pe7a4weirj2g" path="res://textures/dark.png" id="2_08fdt"]
@@ -60,46 +60,46 @@ roughness = 0.5
 uv1_triplanar = true
 uv1_triplanar_sharpness = 0.000850145
 
-[node name="test_world" type="Node3D"]
+[node name="test_world" type="Node3D" unique_id=1604557493]
 
-[node name="Character" parent="." instance=ExtResource("1_e18vq")]
+[node name="Character" parent="." unique_id=885346914 instance=ExtResource("1_e18vq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=291661268]
 environment = SubResource("Environment_20rw3")
 
-[node name="sun" type="DirectionalLight3D" parent="."]
+[node name="sun" type="DirectionalLight3D" parent="." unique_id=1877684847]
 transform = Transform3D(0.87959, -0.436605, 0.188936, 0, 0.397148, 0.917755, -0.475732, -0.807248, 0.349328, 0, 0, 0)
 light_energy = 2.0
 shadow_enabled = true
 
-[node name="terrain" type="Node3D" parent="."]
+[node name="terrain" type="Node3D" parent="." unique_id=746620120]
 
-[node name="CSGBox3D" type="CSGBox3D" parent="terrain"]
+[node name="CSGBox3D" type="CSGBox3D" parent="terrain" unique_id=1133026826]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, -0.5, 10)
 use_collision = true
 size = Vector3(30, 1, 30)
 material = SubResource("StandardMaterial3D_67ysu")
 
-[node name="CSGBox3D2" type="CSGBox3D" parent="terrain"]
+[node name="CSGBox3D2" type="CSGBox3D" parent="terrain" unique_id=1417504755]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -10)
 use_collision = true
 size = Vector3(10, 1, 10)
 material = SubResource("StandardMaterial3D_gomnb")
 
-[node name="CSGBox3D3" type="CSGBox3D" parent="terrain"]
+[node name="CSGBox3D3" type="CSGBox3D" parent="terrain" unique_id=404655208]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 1.8, -13)
 use_collision = true
 size = Vector3(4, 0.5, 4)
 material = SubResource("StandardMaterial3D_gomnb")
 
-[node name="CSGBox3D4" type="CSGBox3D" parent="terrain"]
+[node name="CSGBox3D4" type="CSGBox3D" parent="terrain" unique_id=79436812]
 transform = Transform3D(0.939693, 0.34202, 0, -0.34202, 0.939693, 0, 0, 0, 1, -9.5, 1.2, -10)
 use_collision = true
 size = Vector3(10, 1, 10)
 material = SubResource("StandardMaterial3D_u0sbk")
 
-[node name="CSGBox3D5" type="CSGBox3D" parent="terrain"]
+[node name="CSGBox3D5" type="CSGBox3D" parent="terrain" unique_id=528296241]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 3, -15.5)
 use_collision = true
 size = Vector3(19, 8, 1)
