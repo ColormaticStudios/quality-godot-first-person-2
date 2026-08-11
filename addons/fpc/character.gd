@@ -106,6 +106,8 @@ extends CharacterBody3D
 ## Enables the view bobbing animation.
 @export var view_bobbing : bool = true
 ## Enables an immersive animation when the player jumps and hits the ground.
+@export var view_tilting : bool = false
+## Enables an immersive "view tilting" effect when the player turns their head.
 @export var jump_animation : bool = true
 ## This determines wether the player can use the pause button, not wether the game will actually pause.
 @export var pausing_enabled : bool = true
@@ -128,7 +130,12 @@ var was_on_floor : bool = true # Was the player on the floor last frame (for lan
 var RETICLE : Control
 
 # Stores mouse input for rotating the camera in the physics process
-var mouseInput : Vector2 = Vector2(0,0)
+var mouse_input : Vector2 = Vector2(0,0)
+
+# Stores horizontal movement input
+var input_dir : Vector2 = Vector2.ZERO
+# Whether or not the player is moving
+var moving : bool = false
 
 #endregion
 
@@ -257,8 +264,20 @@ func handle_head_rotation():
 		else:
 			HEAD.rotation.y += controller_view_rotation.y
 
-	mouseInput = Vector2(0,0)
-	HEAD.rotation.x = clamp(HEAD.rotation.x, deg_to_rad(-90), deg_to_rad(90))
+	if view_tilting:
+		var target_tilt := clamp(
+			mouse_input.x * mouse_sensitivity * -1.0 * 1.5,
+			-5.0,
+			5.0
+		)
+		HEAD.rotation_degrees.z = lerpf(
+			HEAD.rotation_degrees.z,
+			target_tilt,
+			1.0 - exp(-12.0 * delta) # Change -12.0 to adjust tilt responsiveness: lower is floatier, higher is snappier
+		)
+
+	mouse_input = Vector2.ZERO
+	HEAD.rotation_degrees.x = clamp(HEAD.rotation_degrees.x, -90, 90)
 
 
 func check_controls(): # If you add a control, you might want to add a check for it here.
