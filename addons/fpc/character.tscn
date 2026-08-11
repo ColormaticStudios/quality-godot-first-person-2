@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://cc1m2a1obsyn4"]
+[gd_scene format=3 uid="uid://cc1m2a1obsyn4"]
 
 [ext_resource type="Script" uid="uid://hutuis63hgev" path="res://addons/fpc/character.gd" id="1_0t4e8"]
 [ext_resource type="Script" uid="uid://dgfl3skp075ft" path="res://addons/fpc/EditorModule.gd" id="3_v3ckk"]
@@ -380,7 +380,7 @@ MarginContainer/constants/margin_top = 10
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_k4wwl"]
 
-[node name="Character" type="CharacterBody3D" node_paths=PackedStringArray("HEAD", "CAMERA", "HEADBOB_ANIMATION", "JUMP_ANIMATION", "CROUCH_ANIMATION", "COLLISION_MESH")]
+[node name="Character" type="CharacterBody3D" unique_id=1664366571 node_paths=PackedStringArray("HEAD", "CAMERA", "HEADBOB_ANIMATION", "JUMP_ANIMATION", "CROUCH_ANIMATION", "COLLISION_MESH")]
 transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0, 0, 0)
 script = ExtResource("1_0t4e8")
 default_reticle = "res://addons/fpc/reticles/reticle_1.tscn"
@@ -391,37 +391,31 @@ JUMP_ANIMATION = NodePath("Head/JumpAnimation")
 CROUCH_ANIMATION = NodePath("CrouchAnimation")
 COLLISION_MESH = NodePath("Collision")
 
-[node name="Mesh" type="MeshInstance3D" parent="."]
+[node name="Mesh" type="MeshInstance3D" parent="." unique_id=537830521]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 mesh = SubResource("CapsuleMesh_jw1de")
 
-[node name="Collision" type="CollisionShape3D" parent="."]
+[node name="Collision" type="CollisionShape3D" parent="." unique_id=1716049046]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("CapsuleShape3D_uy03j")
 
-[node name="CrouchAnimation" type="AnimationPlayer" parent="."]
-libraries = {
-"": SubResource("AnimationLibrary_5e5t5")
-}
+[node name="CrouchAnimation" type="AnimationPlayer" parent="." unique_id=1052968532]
+libraries/ = SubResource("AnimationLibrary_5e5t5")
 
-[node name="Head" type="Node3D" parent="."]
+[node name="Head" type="Node3D" parent="." unique_id=1736064418]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 
-[node name="Camera" type="Camera3D" parent="Head"]
+[node name="Camera" type="Camera3D" parent="Head" unique_id=428476260]
 
-[node name="HeadbobAnimation" type="AnimationPlayer" parent="Head"]
-libraries = {
-"": SubResource("AnimationLibrary_o0unb")
-}
+[node name="HeadbobAnimation" type="AnimationPlayer" parent="Head" unique_id=2050130428]
+libraries/ = SubResource("AnimationLibrary_o0unb")
 blend_times = [&"RESET", &"RESET", 0.5, &"RESET", &"walk", 0.5, &"walk", &"RESET", 0.5]
 
-[node name="JumpAnimation" type="AnimationPlayer" parent="Head"]
-libraries = {
-"": SubResource("AnimationLibrary_qeg5r")
-}
+[node name="JumpAnimation" type="AnimationPlayer" parent="Head" unique_id=1967753992]
+libraries/ = SubResource("AnimationLibrary_qeg5r")
 speed_scale = 4.0
 
-[node name="UserInterface" type="Control" parent="."]
+[node name="UserInterface" type="Control" parent="." unique_id=755504862]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -430,7 +424,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
 
-[node name="DebugPanel" type="PanelContainer" parent="UserInterface"]
+[node name="DebugPanel" type="PanelContainer" parent="UserInterface" unique_id=2074722504]
 visible = false
 layout_mode = 0
 offset_left = 10.0
@@ -440,16 +434,16 @@ offset_bottom = 50.0
 theme = SubResource("Theme_wdf0f")
 script = ExtResource("3_x1wcc")
 
-[node name="MarginContainer" type="MarginContainer" parent="UserInterface/DebugPanel"]
+[node name="MarginContainer" type="MarginContainer" parent="UserInterface/DebugPanel" unique_id=974757027]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="UserInterface/DebugPanel/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="UserInterface/DebugPanel/MarginContainer" unique_id=665000927]
 layout_mode = 2
 
-[node name="CrouchCeilingDetection" type="ShapeCast3D" parent="."]
+[node name="CrouchCeilingDetection" type="ShapeCast3D" parent="." unique_id=1617131810]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("SphereShape3D_k4wwl")
 target_position = Vector3(0, 0.5, 0)
 
-[node name="EditorModule" type="Node" parent="."]
+[node name="EditorModule" type="Node" parent="." unique_id=2006178381]
 script = ExtResource("3_v3ckk")
