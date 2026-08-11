@@ -78,7 +78,7 @@ extends CharacterBody3D
 	LOOK_DOWN = "look_down"
 	}
 ## The sensitivity of the analog stick that controls camera rotation. Lower is less sensitive and higher is more sensitive.
-@export_range(0.001, 1, 0.001) var look_sensitivity : float = 0.035
+@export_range(0.001, 0.1, 0.001) var look_sensitivity : float = 0.035
 
 #endregion
 
