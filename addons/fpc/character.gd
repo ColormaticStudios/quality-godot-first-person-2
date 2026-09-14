@@ -228,6 +228,13 @@ func _handle_movement(delta : float, input_dir : Vector2) -> void:
 	move_and_slide()
 
 	if in_air_momentum:
+		if motion_smoothing:
+			velocity.x = lerp(velocity.x, direction3D.x * speed, acceleration * delta)
+			velocity.z = lerp(velocity.z, direction3D.z * speed, acceleration * delta)
+		else:
+			velocity.x = direction3D.x * speed
+			velocity.z = direction3D.z * speed
+	else:
 		if is_on_floor():
 			if motion_smoothing:
 				velocity.x = lerp(velocity.x, direction3D.x * speed, acceleration * delta)
@@ -235,13 +242,6 @@ func _handle_movement(delta : float, input_dir : Vector2) -> void:
 			else:
 				velocity.x = direction3D.x * speed
 				velocity.z = direction3D.z * speed
-	else:
-		if motion_smoothing:
-			velocity.x = lerp(velocity.x, direction3D.x * speed, acceleration * delta)
-			velocity.z = lerp(velocity.z, direction3D.z * speed, acceleration * delta)
-		else:
-			velocity.x = direction3D.x * speed
-			velocity.z = direction3D.z * speed
 
 
 func _handle_head_rotation(delta : float) -> void:
