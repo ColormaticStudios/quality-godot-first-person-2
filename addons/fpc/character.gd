@@ -4,6 +4,7 @@
 
 
 extends CharacterBody3D
+class_name Character
 
 
 #region Character Export Group
