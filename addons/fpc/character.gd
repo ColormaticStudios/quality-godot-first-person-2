@@ -130,8 +130,19 @@ var was_on_floor : bool = true # Was the player on the floor last frame (for lan
 # The reticle should always have a Control node as the root
 var RETICLE : Control
 
-# Stores mouse input for rotating the camera in the physics process
+# Accumulates mouse input until the next camera rotation (on Web, only the latest event, see web_mouse_workaround)
 var mouse_input : Vector2 = Vector2(0,0)
+
+# Workaround for camera jumps in web exports (6dfad6e): in Chrome on Windows, pointer lock sometimes reports false
+# mouse motion of almost half the window size in one event. On Web, input accumulation is disabled (see _ready) and
+# only the latest mouse motion event is used (see _unhandled_input). This hides most of the false motion, but also
+# loses real motion when several events arrive before the next camera rotation.
+var web_mouse_workaround : bool = OS.get_name() == "Web"
+
+# View tilting measures the head turn over intervals of at least 1/60 s and one frame (see _handle_head_rotation)
+var tilt_turned : float = 0.0
+var tilt_time : float = 0.0
+var target_tilt : float = 0.0
 
 # Stores horizontal movement input
 var input_dir : Vector2 = Vector2.ZERO
@@ -152,6 +163,11 @@ func _ready() -> void:
 	HEAD.rotation.y = rotation.y
 	rotation.y = 0
 
+	# With physics interpolation, the head is rotated every rendered frame (see _process), so it must not be
+	# physics-interpolated itself. It still follows the interpolated body. A mode set in the scene is kept.
+	if HEAD.physics_interpolation_mode == Node.PHYSICS_INTERPOLATION_MODE_INHERIT:
+		HEAD.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
+
 	if default_reticle:
 		change_reticle(default_reticle)
 
@@ -159,13 +175,21 @@ func _ready() -> void:
 	_check_controls()
 	_enter_normal_state()
 
-	if OS.get_name() == "Web":
+	if web_mouse_workaround:
 		Input.set_use_accumulated_input(false)
 
 
-func _process(_delta : float) -> void:
+func _process(delta : float) -> void:
 	if pausing_enabled:
 		_handle_pausing()
+
+	# With physics interpolation, the body is drawn between physics ticks, so the camera is rotated every rendered frame.
+	# Without it, or if the head is interpolated (a mode set in the scene), the camera is rotated on physics ticks.
+	if is_physics_interpolated_and_enabled() and not HEAD.is_physics_interpolated():
+		_handle_head_rotation(delta)
+
+	if dynamic_fov: # This may be changed to an AnimationPlayer
+		_update_camera_fov()
 
 	_update_debug_menu_per_frame()
 
@@ -186,14 +210,13 @@ func _physics_process(delta : float) -> void:
 	_handle_movement(delta, input_dir)
 	current_speed = Vector3.ZERO.distance_to(get_real_velocity())
 
-	_handle_head_rotation(delta)
+	if not is_physics_interpolated_and_enabled() or HEAD.is_physics_interpolated(): # Otherwise it is rotated in _process
+		_handle_head_rotation(delta)
 
 	# The player is not able to stand up if the ceiling is too low
 	low_ceiling = $CrouchCeilingDetection.is_colliding()
 
 	_handle_state(moving)
-	if dynamic_fov: # This may be changed to an AnimationPlayer
-		_update_camera_fov()
 
 	if view_bobbing:
 		_play_headbob_animation(moving)
@@ -246,6 +269,8 @@ func _handle_movement(delta : float, input_dir : Vector2) -> void:
 
 
 func _handle_head_rotation(delta : float) -> void:
+	var yaw_before : float = HEAD.rotation.y # For view tilting, which follows how fast the head turns
+
 	if invert_camera_x_axis:
 		HEAD.rotation_degrees.y -= mouse_input.x * mouse_sensitivity * -1
 	else:
@@ -257,7 +282,8 @@ func _handle_head_rotation(delta : float) -> void:
 		HEAD.rotation_degrees.x -= mouse_input.y * mouse_sensitivity
 
 	if controller_support:
-		var controller_view_rotation = Input.get_vector(controller_controls.LOOK_DOWN, controller_controls.LOOK_UP, controller_controls.LOOK_RIGHT, controller_controls.LOOK_LEFT) * look_sensitivity # These are inverted because of the nature of 3D rotation.
+		# look_sensitivity is the turn in 1/60 s, so it is scaled by delta to keep the stick speed the same at any FPS
+		var controller_view_rotation = Input.get_vector(controller_controls.LOOK_DOWN, controller_controls.LOOK_UP, controller_controls.LOOK_RIGHT, controller_controls.LOOK_LEFT) * look_sensitivity * delta * 60.0 # These are inverted because of the nature of 3D rotation.
 		if invert_camera_y_axis:
 			HEAD.rotation.x += controller_view_rotation.x * -1
 		else:
@@ -269,11 +295,15 @@ func _handle_head_rotation(delta : float) -> void:
 			HEAD.rotation.y += controller_view_rotation.y
 
 	if view_tilting:
-		var target_tilt := clamp(
-			mouse_input.x * mouse_sensitivity * -1.0 * 1.5,
-			-5.0,
-			5.0
-		)
+		# The tilt is 1.5x the degrees the head turns in 1/60 s. The turn is measured over intervals of at least 1/60 s
+		# and one rendered frame, so the tilt does not depend on the frame rate or on how often the mouse reports motion.
+		if delta > 0.0: # At Engine.time_scale 0, turns are not added up, so the tilt does not jump when time resumes
+			tilt_turned += rad_to_deg(angle_difference(yaw_before, HEAD.rotation.y))
+			tilt_time += delta
+		if tilt_time >= maxf(1.0 / 60.0, get_process_delta_time()):
+			target_tilt = clampf(tilt_turned / (tilt_time * 60.0) * 1.5, -5.0, 5.0)
+			tilt_turned = 0.0
+			tilt_time = 0.0
 		HEAD.rotation_degrees.z = lerpf(
 			HEAD.rotation_degrees.z,
 			target_tilt,
@@ -467,7 +497,10 @@ func _update_debug_menu_per_tick() -> void:
 
 func _unhandled_input(event : InputEvent) -> void:
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-		mouse_input = event.screen_relative
+		if web_mouse_workaround:
+			mouse_input = event.screen_relative # Only the latest event, see web_mouse_workaround
+		else:
+			mouse_input += event.screen_relative # Several events can arrive before the next camera rotation
 	# Toggle debug menu
 	elif event is InputEventKey:
 		if event.is_released():
@@ -489,10 +522,12 @@ func change_reticle(reticle) -> void: # Yup, this function is kinda strange
 
 
 func _update_camera_fov() -> void:
+	# Moves 30% of the way to the target FOV every 1/60 s, at any FPS (this runs in _process)
+	var weight : float = 1.0 - pow(0.7, get_process_delta_time() * 60.0)
 	if state == "sprinting":
-		CAMERA.fov = lerp(CAMERA.fov, 85.0, 0.3)
+		CAMERA.fov = lerp(CAMERA.fov, 85.0, weight)
 	else:
-		CAMERA.fov = lerp(CAMERA.fov, 75.0, 0.3)
+		CAMERA.fov = lerp(CAMERA.fov, 75.0, weight)
 
 func _handle_pausing() -> void:
 	if Input.is_action_just_pressed(controls.PAUSE):
