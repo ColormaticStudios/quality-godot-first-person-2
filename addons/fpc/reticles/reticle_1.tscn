@@ -38,11 +38,13 @@ func animate_reticle_lines():
 	var origin = Vector3(0,0,0)
 	var pos = Vector2(0,0)
 	var speed = origin.distance_to(vel)
+	# reticle_speed is the share of the remaining distance covered in 1/60 s, so the animation is the same at any FPS
+	var weight = 1.0 - pow(1.0 - clampf(reticle_speed, 0.0, 1.0), get_process_delta_time() * 60.0)
 	
-	reticle_lines[0].position = lerp(reticle_lines[0].position, pos + Vector2(0, -speed * reticle_spread), reticle_speed)
-	reticle_lines[1].position = lerp(reticle_lines[1].position, pos + Vector2(-speed * reticle_spread, 0), reticle_speed)
-	reticle_lines[2].position = lerp(reticle_lines[2].position, pos + Vector2(speed * reticle_spread, 0), reticle_speed)
-	reticle_lines[3].position = lerp(reticle_lines[3].position, pos + Vector2(0, speed * reticle_spread), reticle_speed)
+	reticle_lines[0].position = lerp(reticle_lines[0].position, pos + Vector2(0, -speed * reticle_spread), weight)
+	reticle_lines[1].position = lerp(reticle_lines[1].position, pos + Vector2(-speed * reticle_spread, 0), weight)
+	reticle_lines[2].position = lerp(reticle_lines[2].position, pos + Vector2(speed * reticle_spread, 0), weight)
+	reticle_lines[3].position = lerp(reticle_lines[3].position, pos + Vector2(0, speed * reticle_spread), weight)
 
 
 func update_reticle_settings():
