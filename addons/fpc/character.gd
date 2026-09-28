@@ -298,7 +298,7 @@ func _handle_head_rotation(delta : float) -> void:
 		# The tilt is 1.5x the degrees the head turns in 1/60 s. The turn is measured over intervals of at least 1/60 s
 		# and one rendered frame, so the tilt does not depend on the frame rate or on how often the mouse reports motion.
 		if delta > 0.0: # At Engine.time_scale 0, turns are not added up, so the tilt does not jump when time resumes
-			tilt_turned += rad_to_deg(angle_difference(yaw_before, HEAD.rotation.y))
+			tilt_turned += rad_to_deg(HEAD.rotation.y - yaw_before) # Not wrapped, so a turn of more than 180° keeps its sign
 			tilt_time += delta
 		if tilt_time >= maxf(1.0 / 60.0, get_process_delta_time()):
 			target_tilt = clampf(tilt_turned / (tilt_time * 60.0) * 1.5, -5.0, 5.0)
